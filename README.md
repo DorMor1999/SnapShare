@@ -34,7 +34,7 @@ SnapShare is an intelligent photo management platform designed for event organiz
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/snapshare.git
+   git clone https://github.com/DorMor1999/SnapShare
    ```
 
 ## Technologies Used
