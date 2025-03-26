@@ -1,5 +1,5 @@
 // react imports
-import React, { useContext, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { useNavigate } from 'react-router';
 
 // bootsrap imports
@@ -12,14 +12,14 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 //my imports
 import logo from '../../../assets/logo/logo croped.png';
 import classes from './NavBar.module.css';
-import SettingsIcon from '../Icons/SettingsIcon';
-import LogOutIcon from '../Icons/LogOutIcon';
-import LogInIcon from '../Icons/LogInIcon';
-import PersonPlusIcon from '../Icons/PersonPlusIcon';
+import SettingsIcon from '../UI/Icons/SettingsIcon';
+import LogOutIcon from '../UI/Icons/LogOutIcon';
+import LogInIcon from '../UI/Icons/LogInIcon';
+import PersonPlusIcon from '../UI/Icons/PersonPlusIcon';
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
-  const isConnected: boolean = false;
+  const isConnected: boolean = true;
 
   function moveToOtherPage(path: string): void {
     navigate(`${path}`);
@@ -28,10 +28,12 @@ const NavBar: React.FC = () => {
   let content;
   if (isConnected) {
     const pendingInvitations: number = 5;
+    const fullName: string = "Doron Ben Zaken";
 
     content = (
       <Fragment>
         <Nav className="me-auto">
+        <Nav.Link>{fullName}</Nav.Link>
           <Nav.Link onClick={() => moveToOtherPage('/events')}>Events</Nav.Link>
           <Nav.Link>
             Invitations{' '}

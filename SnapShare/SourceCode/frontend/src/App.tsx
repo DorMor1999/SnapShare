@@ -1,6 +1,6 @@
 //depencies
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router';
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
 
 //pages
 import HomePage from './pages/home/HomePage';
