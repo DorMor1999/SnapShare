@@ -12,3 +12,8 @@
     background-color: 	#DC3545 !important;
     color: white !important;
 }
+
+.disabled-link-full-name {
+    pointer-events: none;
+    cursor: default; /* Optional: change the cursor to indicate it's unclickable */
+  }

@@ -33,7 +33,7 @@ const NavBar: React.FC = () => {
     content = (
       <Fragment>
         <Nav className="me-auto">
-        <Nav.Link>{fullName}</Nav.Link>
+        <Nav.Link className={classes["disabled-link-full-name"]}>{fullName}</Nav.Link>
           <Nav.Link onClick={() => moveToOtherPage('/events')}>Events</Nav.Link>
           <Nav.Link>
             Invitations{' '}
