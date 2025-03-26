@@ -1,14 +1,25 @@
-import React, { useContext } from 'react';
+// react imports
+import React, { useContext, Fragment } from 'react';
+import { useNavigate } from 'react-router';
+
+// bootsrap imports
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import Badge from 'react-bootstrap/Badge';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useNavigate } from 'react-router';
+
+//my imports
 import logo from '../../../assets/logo/logo croped.png';
+import classes from './NavBar.module.css';
+import SettingsIcon from '../Icons/SettingsIcon';
+import LogOutIcon from '../Icons/LogOutIcon';
+import LogInIcon from '../Icons/LogInIcon';
+import PersonPlusIcon from '../Icons/PersonPlusIcon';
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
-  const isConnected: boolean = true;
+  const isConnected: boolean = false;
 
   function moveToOtherPage(path: string): void {
     navigate(`${path}`);
@@ -16,13 +27,53 @@ const NavBar: React.FC = () => {
 
   let content;
   if (isConnected) {
+    const pendingInvitations: number = 5;
+
     content = (
-      <Nav className="me-auto">
-        <Nav.Link onClick={() => moveToOtherPage('/movies')}>Events</Nav.Link>
-      </Nav>
+      <Fragment>
+        <Nav className="me-auto">
+          <Nav.Link onClick={() => moveToOtherPage('/events')}>Events</Nav.Link>
+          <Nav.Link>
+            Invitations{' '}
+            {pendingInvitations > 0 && (
+              <Badge className={classes['invitations-badge']} pill bg="danger">
+                {pendingInvitations}
+              </Badge>
+            )}
+          </Nav.Link>
+          <NavDropdown
+            title={
+              <Fragment>
+                <SettingsIcon width={16} height={16} /> Settings
+              </Fragment>
+            }
+            id="basic-nav-dropdown"
+          >
+            <NavDropdown.Item href="#action/3.1">Change Data</NavDropdown.Item>
+            <NavDropdown.Divider />
+            <NavDropdown.Item className={classes["logout-item"]}  href="#action/3.4">
+            <LogOutIcon width={16} height={16}/> LogOut
+            </NavDropdown.Item>
+          </NavDropdown>
+        </Nav>
+      </Fragment>
     );
   } else {
-    content = <></>;
+    content = <Fragment>
+      <Nav className="me-auto">
+          <NavDropdown
+            title={
+              <Fragment>
+                 Authentication
+              </Fragment>
+            }
+            id="basic-nav-dropdown"
+          >
+            <NavDropdown.Item href="#action/3.1">{<LogInIcon width={16} height={16}/>} LogIn</NavDropdown.Item>
+            <NavDropdown.Item href="#action/3.1">{<PersonPlusIcon width={16} height={16}/>} Register</NavDropdown.Item>
+          </NavDropdown>
+        </Nav>
+    </Fragment>;
   }
 
   return (
@@ -37,8 +88,8 @@ const NavBar: React.FC = () => {
           <Navbar.Brand onClick={() => moveToOtherPage('/')}>
             <img
               src={logo}
-              width="30"
-              height="30"
+              width="35"
+              height="35"
               className="d-inline-block align-top"
               alt="React Bootstrap logo"
             />{' '}

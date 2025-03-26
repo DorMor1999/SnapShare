@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router';
 
 //pages
 import HomePage from './pages/home/HomePage';
+import EventsPage from './pages/events/EventsPage';
 
 
 // components
@@ -17,8 +18,8 @@ function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          {/*<Route path="/movies" element={<MoviesPage />} />
-          <Route path="/series" element={<SeriesPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          {/* <Route path="/series" element={<SeriesPage />} />
           <Route path="/movies/:itemId" element={<MoviePage />} />
           <Route path="/series/:itemId" element={<SpecificSeriesPage />} /> */}
         </Routes>
