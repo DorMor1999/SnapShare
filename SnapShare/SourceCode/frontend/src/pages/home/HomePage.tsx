@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
   return (
     <div className={`${classes['fullscreen-div']} bg-light`}>
       <Container className={classes['container']}>
-        <Row>
+        <Row className='justify-content-center'>
           <Col md={6} sm={12}>
             <h1>Home Page</h1>
             <p className='fs-5'>
@@ -35,14 +35,6 @@ const HomePage: React.FC = () => {
               allows event owners to share photos privately with relevant
               participants.
             </p>
-            <br/>
-            <Row>
-              {/* need to add buttons */}
-              <Col></Col>
-              <Col></Col>
-            </Row>
-            <br/>
-
           </Col>
           <Col md={6} sm={12}>
             <IntervalCarousel images={imagesArray} interval={3000} />

@@ -19,7 +19,7 @@ import PersonPlusIcon from '../UI/Icons/PersonPlusIcon';
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
-  const isConnected: boolean = true;
+  const isConnected: boolean = false;
 
   function moveToOtherPage(path: string): void {
     navigate(`${path}`);
@@ -71,7 +71,7 @@ const NavBar: React.FC = () => {
             }
             id="basic-nav-dropdown"
           >
-            <NavDropdown.Item href="#action/3.1">{<LogInIcon width={16} height={16}/>} LogIn</NavDropdown.Item>
+            <NavDropdown.Item onClick={() => moveToOtherPage('/login')}>{<LogInIcon width={16} height={16}/>} LogIn</NavDropdown.Item>
             <NavDropdown.Item href="#action/3.1">{<PersonPlusIcon width={16} height={16}/>} Register</NavDropdown.Item>
           </NavDropdown>
         </Nav>
