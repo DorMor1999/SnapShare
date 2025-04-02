@@ -1,14 +1,16 @@
 //depencies
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 
 //pages
 import HomePage from './pages/home/HomePage';
 import EventsPage from './pages/events/EventsPage';
-
-// components
-import NavBar from './shared/components/NavBar/NavBar';
 import LogInPage from './pages/login/LogInPage';
+import RagisterPage from './pages/register/RagisterPage';
+
+
+//my components
+import NavBar from './shared/components/NavBar/NavBar';
 
 function App() {
   const isConnected: boolean = false;
@@ -27,7 +29,7 @@ function App() {
       <Fragment>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LogInPage/>} />
-        <Route path="/register" element={<EventsPage />} />
+        <Route path="/register" element={<RagisterPage />} />
       </Fragment>
     );
   }

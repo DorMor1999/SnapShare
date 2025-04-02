@@ -72,7 +72,7 @@ const NavBar: React.FC = () => {
             id="basic-nav-dropdown"
           >
             <NavDropdown.Item onClick={() => moveToOtherPage('/login')}>{<LogInIcon width={16} height={16}/>} LogIn</NavDropdown.Item>
-            <NavDropdown.Item href="#action/3.1">{<PersonPlusIcon width={16} height={16}/>} Register</NavDropdown.Item>
+            <NavDropdown.Item onClick={() => moveToOtherPage('/register')}>{<PersonPlusIcon width={16} height={16}/>} Register</NavDropdown.Item>
           </NavDropdown>
         </Nav>
     </Fragment>;
