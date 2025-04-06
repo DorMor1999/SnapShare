@@ -7,22 +7,26 @@ recognition_bp = Blueprint('recognition_bp', __name__, url_prefix='/recognize')
 def trigger_recognition():
     """
     Triggers the face recognition process on uploaded profiles and bulk photos.
-    Accepts optional 'tolerance' and 'std_factor' in JSON body.
+    Accepts 'event_photos_keys' and 'user_encodes' (array of dictionaries containing 'user_id' and 'encode') in the JSON body.
     """
     data = request.get_json() or {}
-    tolerance = data.get('tolerance') # Can be None
-    std_factor = data.get('std_factor') # Can be None
+    event_photos_keys = data.get('event_photos_keys')  # Array of photo keys
+    user_encodes = data.get('user_encodes')  # Array of dictionaries containing 'user_id' and 'encode'
 
-    # Convert to float if provided, otherwise None will use defaults in service
-    try:
-        if tolerance is not None:
-            tolerance = float(tolerance)
-        if std_factor is not None:
-            std_factor = float(std_factor)
-    except ValueError:
-        return jsonify({"error": "Invalid number format for tolerance or std_factor"}), 400
+    # Validate if 'event_photos_keys' is a list
+    if not isinstance(event_photos_keys, list):
+        return jsonify({"error": "'event_photos_keys' must be an array"}), 400
 
+    # Validate if user_encodes is a list of dictionaries with 'user_id' and 'encode' keys
+    if not isinstance(user_encodes, list) or not all(isinstance(item, dict) and 'user_id' in item and 'encode' in item for item in user_encodes):
+        return jsonify({"error": "'user_encodes' must be an array of dictionaries containing 'user_id' and 'encode'"}), 400
 
-    results, status_code = run_face_recognition(tolerance=tolerance, std_factor=std_factor)
+    #need to add here the part we get all photos from storage
+
+    # Call face recognition function with the provided event_photos_keys and user_encodes
+    results, status_code = run_face_recognition(
+        event_photos_keys=event_photos_keys,
+        user_encodes=user_encodes
+    )
 
     return jsonify(results), status_code
