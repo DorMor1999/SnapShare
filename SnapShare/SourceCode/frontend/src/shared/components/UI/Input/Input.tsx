@@ -45,11 +45,7 @@ const Input: React.FC<InputProps> = ({
       </FloatingLabel>
 
       <p className="text-danger">
-        {error && error.message && (
-          <Fragment>
-             {error.message}
-          </Fragment>
-        )}
+        {error && error.message && <Fragment>{error.message}</Fragment>}
       </p>
     </Fragment>
   );
