@@ -3,7 +3,6 @@ import React, { Fragment } from 'react';
 // Bootstrap imports
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import Alert from 'react-bootstrap/Alert';
 import AlertIcon from '../Icons/AlertIcon';
 
 // Import FieldError from react-hook-form
@@ -28,7 +27,7 @@ const Input: React.FC<InputProps> = ({
     labelContent = (
       <Fragment>
         {label}
-        <span className='text-danger fw-bold'>{" "}*</span>
+        <span className="text-danger fw-bold"> *</span>
       </Fragment>
     );
   } else {
@@ -44,11 +43,14 @@ const Input: React.FC<InputProps> = ({
       >
         <Form.Control type={type} placeholder={label} {...rest} />
       </FloatingLabel>
-      {error && error.message && (
-        <Alert variant="danger">
-          <AlertIcon width={16} height={16} /> {error.message}
-        </Alert>
-      )}
+
+      <p className="text-danger">
+        {error && error.message && (
+          <Fragment>
+             {error.message}
+          </Fragment>
+        )}
+      </p>
     </Fragment>
   );
 };
