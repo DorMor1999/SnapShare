@@ -3,7 +3,6 @@ import React, { Fragment } from 'react';
 // Bootstrap imports
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import AlertIcon from '../Icons/AlertIcon';
 
 // Import FieldError from react-hook-form
 import { FieldError } from 'react-hook-form';
