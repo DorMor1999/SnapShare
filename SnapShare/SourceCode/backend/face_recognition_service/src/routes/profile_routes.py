@@ -28,6 +28,9 @@ def encode_profile_photos(user_id):
             photos.append(img_data)
         except Exception as e:
             return jsonify({"error": f"Invalid image format: {str(e)}"}), 400
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")         
+    print(f"photos are : {photos}")  
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")         
 
     # Compute average encoding
     avg_encoding = get_average_encoding(photos, {})

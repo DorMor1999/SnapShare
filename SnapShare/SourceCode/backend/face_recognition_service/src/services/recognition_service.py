@@ -32,10 +32,11 @@ def load_and_encode_photo(photo_data, cache):
     photo_hash = hash(photo_data)
     if photo_hash in cache:
         return cache[photo_hash]
+    print("Photo not in cache")
 
     # Convert photo data to a photo object
-    photo = Image.open(BytesIO(photo_data))
-    photo_array = np.array(photo)  # Convert photo to numpy array for face_recognition
+    photo = Image.open(BytesIO(photo_data)).convert('RGB')  # ✅ Ensure RGB format
+    photo_array = np.array(photo).astype(np.uint8)  # ✅ Ensure 8-bit depth
 
     face_locations = face_recognition.face_locations(photo_array)  # Detect all faces
     face_encodings = face_recognition.face_encodings(photo_array, face_locations)  # Encode all faces
