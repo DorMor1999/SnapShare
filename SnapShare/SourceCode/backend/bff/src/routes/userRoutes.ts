@@ -1,13 +1,27 @@
 import { Router } from "express";
+import {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUserById,
+  deleteUserById,
+} from "../controllers/user.controller";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.send("Get all users");
-});
+// Get all users
+router.get("/", getAllUsers);
 
-router.post("/", (req, res) => {
-  res.send("Create a user");
-});
+// Get a specific user by ID
+router.get("/:id", getUserById);
+
+// Create a new user
+router.post("/register", createUser);
+
+// Update a user by ID
+router.put("/:id", updateUserById);
+
+// Delete a user by ID
+router.delete("/:id", deleteUserById);
 
 export default router;
