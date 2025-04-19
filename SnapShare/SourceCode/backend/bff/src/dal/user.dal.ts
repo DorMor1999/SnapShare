@@ -12,6 +12,12 @@ export const fetchUserById = async (id: string): Promise<IUser | null> => {
 
 // Create a new user
 export const createUser = async (userData: Partial<IUser>): Promise<IUser> => {
+  // Check if a user with the same email already exists
+  const existingUser = await fetchUserByEmail(userData.email!);
+  if (existingUser) {
+    throw new Error("A user with this email already exists.");
+  }
+
   const user = new User(userData);
   return await user.save();
 };
@@ -27,4 +33,9 @@ export const updateUserById = async (
 // Delete a user by ID
 export const deleteUserById = async (id: string): Promise<IUser | null> => {
   return await User.findByIdAndDelete(id);
+};
+
+// Fetch a user by email
+export const fetchUserByEmail = async (email: string): Promise<IUser | null> => {
+  return await User.findOne({ email });
 };

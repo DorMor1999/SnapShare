@@ -1,12 +1,12 @@
 import { Router } from "express";
+import { registerUser, loginUser } from "../controllers/authentication.controller";
 
 const router = Router();
 
-router.post("/register", (req, res) => {
-    res.send("Create a user");
-  });
+// Register a new user
+router.post("/register", registerUser);
 
-router.post("/login", (req, res) => {
-    res.send("Create a user");
-});
-  
+// Login a user
+router.post("/login", loginUser);
+
+export default router;
