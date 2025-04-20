@@ -11,7 +11,6 @@ import Input from '../../shared/components/UI/Input/Input';
 import MyButton from '../../shared/components/UI/Button/MyButton';
 import classes from './RegisterPage.module.css';
 
-
 // bootstrap imports
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -21,6 +20,7 @@ type FormData = {
   lastName: string;
   email: string;
   password: string;
+  phone: string;
   profilePicture1: FileList;
   profilePicture2: FileList;
 };
@@ -106,6 +106,21 @@ const RegisterPage: React.FC = () => {
                     },
                   })}
                   error={errors.password}
+                />
+              </Col>
+              <Col sm={12}>
+                <Input
+                  label="Phone"
+                  type="tel"
+                  required={true}
+                  {...register('phone', {
+                    required: 'Phone number is required',
+                    pattern: {
+                      value: /^[0-9]{9,15}$/,
+                      message: 'Enter a valid phone number',
+                    },
+                  })}
+                  error={errors.phone}
                 />
               </Col>
               <Col sm={12} md={12}>

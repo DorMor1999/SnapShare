@@ -8,7 +8,7 @@ type MyButtonProps = {
   text: string;
   type: "button" | "reset" | "submit";
   variant: string;
-  size: "lg" | "sm";
+  size: "lg" | "sm" | undefined;
 };
 
 const MyButton: React.FC<MyButtonProps> = ({ text, type, variant, size}) => {
