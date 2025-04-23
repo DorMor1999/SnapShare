@@ -7,8 +7,9 @@ export const mapUserToDto = (user: IUser): IUserDto => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    profileImageIds: user.profileImageIds,
-    password: user.hashedPassword, // Map hashedPassword to password
+    profilePhotosUrls: user.profilePhotosUrls,
+    profilePhotosEncoding: user.profilePhotosEncoding,
+    password: user.hashedPassword,
     phoneNumber: user.phoneNumber,
   };
 };
@@ -24,8 +25,9 @@ export const mapDtoToUser = (dto: IUserDto): Partial<IUser> => {
     firstName: dto.firstName,
     lastName: dto.lastName,
     email: dto.email,
-    profileImageIds: dto.profileImageIds,
-    hashedPassword: dto.password, // Map password back to hashedPassword
+    profilePhotosUrls: dto.profilePhotosUrls,
+    profilePhotosEncoding: dto.profilePhotosEncoding,
+    hashedPassword: dto.password,
     phoneNumber: dto.phoneNumber,
   };
 };
