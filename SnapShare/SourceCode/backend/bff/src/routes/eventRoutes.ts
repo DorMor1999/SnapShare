@@ -1,13 +1,30 @@
-import { Router } from "express";
+import { Router } from 'express';
+import { authenticateToken } from '../middlewares/auth.middleware';
+import {
+  getAllEvents,
+  createEvent,
+  getEventById,
+  updateEventById,
+  deleteEventById,
+  getUserEvents
+} from '../controllers/event.controller';
+import {
+  createEventSchema,
+  updateEventSchema,
+} from '../validation/event.validation';
+import { validateRequest } from '../middlewares/validations.middleware';
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.send("Get all events");
-});
+// Protect all routes
+router.use(authenticateToken);
 
-router.post("/", (req, res) => {
-  res.send("Create an event");
-});
+// Routes
+router.get('/', getAllEvents);
+router.post('/', validateRequest(createEventSchema), createEvent);
+router.get('/:id', getEventById);
+router.put('/:id', validateRequest(updateEventSchema), updateEventById);
+router.delete('/:id', deleteEventById);
+router.get('/user/:userId', getUserEvents);
 
 export default router;
