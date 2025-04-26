@@ -1,6 +1,6 @@
 import Event from '../models/event.model';
 import { Types } from 'mongoose';
-import { SortOrder } from 'mongoose'
+import { SortOrder } from 'mongoose';
 
 export const findAll = () => {
   return Event.find().lean();
@@ -31,14 +31,21 @@ export const remove = (id: string) => {
   return Event.findByIdAndDelete(id);
 };
 
-export const findByUserIdSorted = (
+export const findByUserIdSorted = async (
   userId: string,
   sortBy: string,
   sortOrder: SortOrder
 ) => {
-  return Event.find({
-    $or: [{ owners: userId }, { participants: userId }],
+  const userObjectId = new Types.ObjectId(userId);
+
+  const events = await Event.find({
+    $or: [{ owners: userObjectId }, { participants: userObjectId }],
   })
-    .lean()
+    .lean<{ owners: Types.ObjectId[] }[]>() // 👈 just tell TypeScript that owners is ObjectId array
     .sort({ [sortBy]: sortOrder });
+
+  return events.map((event) => ({
+    ...event,
+    isOwner: event.owners.some((ownerId) => ownerId.equals(userObjectId)),
+  }));
 };
