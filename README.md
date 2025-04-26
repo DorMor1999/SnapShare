@@ -39,11 +39,12 @@ SnapShare is an intelligent photo management platform designed for event organiz
 
 ## Technologies Used
 
-- **Frontend:** ?
-- **Backend:** ?
-- **Database:** ?
-- **AI/ML:** ?
-- **Hosting:** ?
+- **Frontend:** React, TypeScript
+- **Backend:**
+  - For frontend communication: Node.js, TypeScript, Express
+  - Face recognition service: Python, Flask, OpenCV, face_recognition
+- **Database:** Azure Cosmos DB for MongoDB
+- **Storage:** Azure Blob Storage
 
 ## 📄 License
 
