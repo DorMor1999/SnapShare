@@ -13,7 +13,7 @@ import RagisterPage from './pages/register/RagisterPage';
 import NavBar from './shared/components/NavBar/NavBar';
 
 function App() {
-  const isConnected: boolean = true;
+  const isConnected: boolean = false;
 
   let routes;
   if (isConnected) {

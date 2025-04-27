@@ -19,7 +19,7 @@ import PersonPlusIcon from '../UI/Icons/PersonPlusIcon';
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
-  const isConnected: boolean = true;
+  const isConnected: boolean = false;
 
   function moveToOtherPage(path: string): void {
     navigate(`${path}`);

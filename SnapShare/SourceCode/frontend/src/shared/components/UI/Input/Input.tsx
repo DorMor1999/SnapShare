@@ -10,7 +10,7 @@ import { FieldError } from 'react-hook-form';
 type InputProps = {
   label: string;
   type: string;
-  required: boolean;
+  required?: boolean;
   error?: FieldError; // More explicit type for error
 } & React.ComponentPropsWithoutRef<typeof Form.Control>; // Pass all Form.Control props
 

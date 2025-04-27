@@ -112,12 +112,14 @@ const RegisterPage: React.FC = () => {
                 <Input
                   label="Phone"
                   type="tel"
-                  required={true}
+                 
                   {...register('phone', {
-                    required: 'Phone number is required',
-                    pattern: {
-                      value: /^[0-9]{9,15}$/,
-                      message: 'Enter a valid phone number',
+                    validate: (value) => {
+                      if (value === '') return true; // Empty is fine
+                      if (!/^[0-9]{9,15}$/.test(value)) {
+                        return 'Enter a valid phone number';
+                      }
+                      return true;
                     },
                   })}
                   error={errors.phone}
