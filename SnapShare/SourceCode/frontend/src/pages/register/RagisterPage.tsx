@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-
-// Import the validateImage function
-import { validateImage } from '../../utils/validation';
 
 // My imports
 import Wrapper from '../../shared/components/UI/Wrapper/Wrapper';
 import BoxForm from '../../shared/components/UI/BoxForm/BoxForm';
 import Input from '../../shared/components/UI/Input/Input';
+import DropzoneInput from '../../shared/components/UI/Input/DropzoneInput';
 import MyButton from '../../shared/components/UI/Button/MyButton';
 import classes from './RegisterPage.module.css';
 
@@ -21,11 +19,10 @@ type FormData = {
   email: string;
   password: string;
   phone: string;
-  profilePicture1: FileList;
-  profilePicture2: FileList;
+  profilePictures: File[];
 };
 
-const imageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+const imageTypes = ['image/jpeg', 'image/jpg'];
 const maxFileSize = 25 * 1024 * 1024; // 25MB limit
 
 const RegisterPage: React.FC = () => {
@@ -33,7 +30,37 @@ const RegisterPage: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<FormData>();
+
+  const profilePictures = watch('profilePictures');
+
+  const onDrop = (acceptedFiles: File[]) => {
+    setValue('profilePictures', acceptedFiles, {
+      shouldValidate: true,
+    });
+  };
+
+  useEffect(() => {
+    // Validation for the dropzone input
+    register('profilePictures', {
+      required: 'You must upload at least one image',
+      validate: (files: File[]) => {
+        if (!files || files.length < 1) return 'At least one image is required';
+        if (files.length > 2) return 'You can upload a maximum of 2 images';
+        for (const file of files) {
+          if (!imageTypes.includes(file.type)) {
+            return 'Only JPG, JPEG formats are allowed';
+          }
+          if (file.size > maxFileSize) {
+            return 'Each file must be under 25MB';
+          }
+        }
+        return true;
+      },
+    });
+  }, [register]);
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     console.log(data);
@@ -112,7 +139,6 @@ const RegisterPage: React.FC = () => {
                 <Input
                   label="Phone"
                   type="tel"
-                 
                   {...register('phone', {
                     validate: (value) => {
                       if (value === '') return true; // Empty is fine
@@ -126,31 +152,12 @@ const RegisterPage: React.FC = () => {
                 />
               </Col>
               <Col sm={12} md={12}>
-                <Input
-                  label="Profile Picture 1"
-                  type="file"
-                  required={true}
-                  accept="image/*"
-                  {...register('profilePicture1', {
-                    required: 'Please upload Profile Picture 1',
-                    validate: (files: FileList) =>
-                      validateImage(files, maxFileSize, imageTypes),
-                  })}
-                  error={errors.profilePicture1}
-                />
-              </Col>
-              <Col sm={12} md={12}>
-                <Input
-                  label="Profile Picture 2"
-                  type="file"
-                  required={true}
-                  accept="image/*"
-                  {...register('profilePicture2', {
-                    required: 'Please upload Profile Picture 2',
-                    validate: (files: FileList) =>
-                      validateImage(files, maxFileSize, imageTypes),
-                  })}
-                  error={errors.profilePicture2}
+                <DropzoneInput
+                  onDrop={(files) =>
+                    setValue('profilePictures', files, { shouldValidate: true })
+                  }
+                  error={errors.profilePictures}
+                  maxFiles={2}
                 />
               </Col>
             </Row>

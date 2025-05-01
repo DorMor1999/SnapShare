@@ -12,7 +12,7 @@ type InputProps = {
   type: string;
   required?: boolean;
   error?: FieldError; // More explicit type for error
-} & React.ComponentPropsWithoutRef<typeof Form.Control>; // Pass all Form.Control props
+} & React.ComponentPropsWithoutRef<typeof Form.Control>; // Pass all Form.Control props (except file-specific ones)
 
 const Input: React.FC<InputProps> = ({
   label,
@@ -43,9 +43,11 @@ const Input: React.FC<InputProps> = ({
         <Form.Control type={type} placeholder={label} {...rest} />
       </FloatingLabel>
 
-      <p className="text-danger">
-        {error && error.message && <Fragment>{error.message}</Fragment>}
-      </p>
+      {error && error.message && (
+        <p className="text-danger">
+          <Fragment>{error.message}</Fragment>
+        </p>
+      )}
     </Fragment>
   );
 };
