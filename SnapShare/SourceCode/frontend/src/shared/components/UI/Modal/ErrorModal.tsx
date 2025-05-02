@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
 interface ErrorModalProps {
   message: string;
@@ -6,19 +7,26 @@ interface ErrorModalProps {
 }
 
 const ErrorModal: React.FC<ErrorModalProps> = ({ message, onClose }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
-        <h2 className="text-xl font-bold mb-4 text-red-600">An Error Occurred</h2>
-        <p className="mb-4 text-gray-700">{message}</p>
-        <button
-          onClick={onClose}
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition"
-        >
+    <Modal show onHide={onClose} centered backdrop="static">
+      <Modal.Header closeButton>
+        <Modal.Title className="text-danger">An Error Occurred</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{message}</Modal.Body>
+      <Modal.Footer>
+        <Button variant="danger" onClick={onClose}>
           Close
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

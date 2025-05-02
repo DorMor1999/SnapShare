@@ -1,9 +1,22 @@
 import React from 'react';
+import { Spinner } from 'react-bootstrap';
 
 const SpinnerOverlay: React.FC = () => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-70">
-      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1050,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+      role="status"
+      aria-label="Loading"
+    >
+      <Spinner animation="border" variant="primary" role="status" />
     </div>
   );
 };
