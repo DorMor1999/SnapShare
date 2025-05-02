@@ -1,5 +1,5 @@
 // react imports
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -12,6 +12,7 @@ import classes from './LogInPage.module.css';
 import useHttpRequest from '../../hooks/useHttpRequest';
 import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
+import { UserContext } from '../../context/UserContext';
 
 // bootstrap imports
 import Row from 'react-bootstrap/Row';
@@ -22,7 +23,15 @@ type FormData = {
   password: string;
 };
 
+type LoginResponse = {
+  message: string;
+  token: string;
+  id: string;
+};
+
 const LogInPage: React.FC = () => {
+  const { setUser } = useContext(UserContext);
+
   const {
     register: loginRegister,
     handleSubmit,
@@ -32,7 +41,7 @@ const LogInPage: React.FC = () => {
   const navigate = useNavigate();
 
   const { data, error, loading, sendRequest, clearError } =
-    useHttpRequest<any>();
+    useHttpRequest<LoginResponse>();
 
   const onSubmit: SubmitHandler<FormData> = async (formData) => {
     const API_URL = import.meta.env.VITE_API_URL;
@@ -46,8 +55,8 @@ const LogInPage: React.FC = () => {
       }
     );
 
-    if (!error) {
-      console.log(data);
+    if (!error && data) {
+      setUser(data.id, data.token);
       navigate('/');
     }
   };

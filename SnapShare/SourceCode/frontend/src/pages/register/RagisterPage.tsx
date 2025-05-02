@@ -85,14 +85,13 @@ const RegisterPage: React.FC = () => {
 
     const API_URL = import.meta.env.VITE_API_URL;
 
-    const { data, error } = await sendRequest(
+    const { error } = await sendRequest(
       `${API_URL}/authentication/register`,
       'POST',
       form
     );
   
     if (!error) {
-      console.log(data);
       navigate('/login');
     }
   };

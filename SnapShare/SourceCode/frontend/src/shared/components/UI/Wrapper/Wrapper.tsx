@@ -1,6 +1,7 @@
 // react imports
 import React from 'react';
 
+import classes from './Wrapper.module.css';
 //bootstrap imports
 import Container from 'react-bootstrap/Container';
 
@@ -8,7 +9,7 @@ import Container from 'react-bootstrap/Container';
 
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-      <Container>
+      <Container className={classes["my-wrapper"]}>
         {children}
       </Container>
     );
