@@ -83,9 +83,16 @@ const RegisterPage: React.FC = () => {
       form.append('files', file);
     });
 
-    await sendRequest('http://localhost:3000/authentication/register', 'POST', form);
-    
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    const { data, error } = await sendRequest(
+      `${API_URL}/authentication/register`,
+      'POST',
+      form
+    );
+  
     if (!error) {
+      console.log(data);
       navigate('/login');
     }
   };

@@ -12,7 +12,7 @@ interface UseHttpRequestReturn<T> {
     method: RequestMethod,
     body?: any,
     customHeaders?: Record<string, string>
-  ) => Promise<void>;
+  ) => Promise<{ data?: T; error?: string }>;
   clearError: () => void;
 }
 
@@ -26,7 +26,7 @@ const useHttpRequest = <T,>(): UseHttpRequestReturn<T> => {
     method: RequestMethod,
     body?: any,
     customHeaders: Record<string, string> = {}
-  ): Promise<void> => {
+  ): Promise<{ data?: T; error?: string }> => {
     setLoading(true);
     setError(null);
 
@@ -45,12 +45,14 @@ const useHttpRequest = <T,>(): UseHttpRequestReturn<T> => {
 
       const response = await axios.request<T>(config);
       setData(response.data);
+      return { data: response.data };
     } catch (err: any) {
-      setError(
+      const errorMsg =
         err.response?.data?.message ||
-          err.message ||
-          'An unexpected error occurred'
-      );
+        err.message ||
+        'An unexpected error occurred';
+      setError(errorMsg);
+      return { error: errorMsg };
     } finally {
       setLoading(false);
     }

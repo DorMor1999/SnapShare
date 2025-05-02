@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import userRoutes from "./routes/userRoutes";
 import eventRoutes from "./routes/eventRoutes";
 import authenticationRoutes from "./routes/authenticationRoutes";
@@ -10,6 +11,8 @@ dotenv.config({ path: envFile });
 const app = express();
 
 connectDB();
+
+app.use(cors());
 
 app.use(express.json());
 
