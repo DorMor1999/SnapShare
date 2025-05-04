@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 
 //my imports
 import MyButton from '../../shared/components/UI/Button/MyButton';
@@ -13,13 +14,6 @@ import { UserContext } from '../../context/UserContext';
 import useHttpRequest from '../../hooks/useHttpRequest';
 import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
-
-// Sample event list
-const eventList = [
-  { id: '1', name: 'React Conference', date: '2025-05-15', isOwner: true },
-  { id: '2', name: 'Tech Meetup', date: '2025-06-01', isOwner: false },
-  { id: '3', name: 'Startup Pitch Night', date: '2025-06-20', isOwner: false },
-];
 
 type Event = {
   _id: string;
@@ -68,19 +62,53 @@ const EventsPage: React.FC = () => {
         <Row className="justify-content-left">
           <Col xs={6}>
             <h1>Events</h1>
-            <br/>
           </Col>
           <Col xs={6}>
-            <div className='d-flex justify-content-end'>
+            <div className="d-flex flex-column align-items-end">
               <MyButton
                 text="New Event"
                 type="button"
                 variant="primary"
                 size={'lg'}
+                link='/events/new'
               />
+              <DropdownButton
+                id="dropdown-basic-button"
+                title="Sort"
+                size={'lg'}
+                variant="secondary"
+                className="mt-2"
+              >
+                <Dropdown.Item
+                  active={sortBy === 'date' && orderBy === 'desc'}
+                  href="/events?sortBy=date&orderBy=desc"
+                >
+                  Date Descending
+                </Dropdown.Item>
+                <Dropdown.Item
+                  active={sortBy === 'date' && orderBy === 'asc'}
+                  href="/events?sortBy=date&orderBy=asc"
+                >
+                  Date Ascending
+                </Dropdown.Item>
+                <Dropdown.Item
+                  active={sortBy === 'name' && orderBy === 'desc'}
+                  href="/events?sortBy=name&orderBy=desc"
+                >
+                  Name Descending
+                </Dropdown.Item>
+                <Dropdown.Item
+                  active={sortBy === 'name' && orderBy === 'asc'}
+                  href="/events?sortBy=name&orderBy=asc"
+                >
+                  Name Ascending
+                </Dropdown.Item>
+              </DropdownButton>
+              
             </div>
+            <br />
           </Col>
-          
+
           {data?.map((event) => (
             <Col key={event._id} md={12} lg={6} className="mb-3">
               <div className="p-3 border rounded shadow-sm d-flex justify-content-between">

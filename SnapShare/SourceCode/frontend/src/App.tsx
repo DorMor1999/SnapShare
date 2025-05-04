@@ -7,12 +7,14 @@ import HomePage from './pages/home/HomePage';
 import EventsPage from './pages/events/EventsPage';
 import LogInPage from './pages/login/LogInPage';
 import RagisterPage from './pages/register/RagisterPage';
+import NewEvent from './pages/NewEvent/NewEvent';
 
 // context
 import { UserContext } from './context/UserContext';
 
 //my components
 import NavBar from './shared/components/NavBar/NavBar';
+
 
 function App() {
   const { isConnected } = useContext(UserContext);
@@ -23,6 +25,7 @@ function App() {
       <Fragment>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/events/new" element={<NewEvent />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );
