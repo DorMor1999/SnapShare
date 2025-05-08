@@ -1,8 +1,9 @@
 import React from 'react';
+import EventForm from '../../shared/components/EventForm/EventForm';
 
 const NewEvent: React.FC = () => {
 
-    return<>new event page</>;
+    return <EventForm formType='New Event' />;
 }
 
 export default NewEvent;
