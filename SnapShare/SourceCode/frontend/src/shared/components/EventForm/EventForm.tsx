@@ -59,7 +59,7 @@ const EventForm: React.FC<EventFormProps> = ({
 
   const { userId, token } = useContext(UserContext);
 
-  const { data, error, loading, sendRequest, clearError } =
+  const { error, loading, sendRequest, clearError } =
     useHttpRequest<any>();
 
   const onSubmit: SubmitHandler<FormData> = async (formData) => {
