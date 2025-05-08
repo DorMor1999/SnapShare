@@ -1,5 +1,5 @@
 // react imports
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -21,42 +21,56 @@ import Col from 'react-bootstrap/Col';
 type EventFormProps = {
   formType: 'New Event' | 'Edit Event';
   name?: string;
-  date?: string | null;
+  date?: string | undefined;
+  eventId?: string;
 };
 
 type FormData = {
   name: string;
-  date: Date;
+  date: string;
 };
 
 const EventForm: React.FC<EventFormProps> = ({
   formType,
   name = '',
-  date = null,
+  date = undefined,
+  eventId = undefined,
 }) => {
   const {
     register: eventRegister,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+    reset,
+  } = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      date: undefined,
+    },
+  });
+
+  useEffect(() => {
+    reset({
+      name: name || '',
+      date: date || undefined,
+    });
+  }, [name, date, reset]);
 
   const navigate = useNavigate();
 
-   const { userId, token } = useContext(UserContext);
+  const { userId, token } = useContext(UserContext);
 
   const { data, error, loading, sendRequest, clearError } =
     useHttpRequest<any>();
 
   const onSubmit: SubmitHandler<FormData> = async (formData) => {
-    
     const API_URL = import.meta.env.VITE_API_URL;
 
-    const inputDate = formData.date; // "1999-06-12T12:00"
+    const inputDateStr = formData.date; // e.g., "1999-06-12T12:00"
 
-    // Parse the input string as a local date
-    const localDate = new Date(inputDate);
+    // Parse the input as a local Date object
+    const localDate = new Date(inputDateStr);
 
-    // Manually build the ISO-like string (preserving local time)
+    // Format it as UTC with 'Z'
     const formattedDate = `${localDate.getFullYear()}-${String(
       localDate.getMonth() + 1
     ).padStart(2, '0')}-${String(localDate.getDate()).padStart(
@@ -74,8 +88,21 @@ const EventForm: React.FC<EventFormProps> = ({
         {
           name: formData.name,
           date: formattedDate,
-          ownerId: userId
-        }, 
+          ownerId: userId,
+        },
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      requestError = error;
+    } else {
+      const { error } = await sendRequest(
+        `${API_URL}/events/${eventId}`,
+        'PUT',
+        {
+          name: formData.name,
+          date: formattedDate,
+        },
         {
           Authorization: `Bearer ${token}`,
         }
@@ -121,10 +148,12 @@ const EventForm: React.FC<EventFormProps> = ({
                     required={true}
                     {...eventRegister('date', {
                       required: 'Date and time are required',
-                      valueAsDate: true,
-                      validate: (value: Date) =>
-                        (value instanceof Date && !isNaN(value.getTime())) ||
-                        'Invalid date and time',
+                      validate: (value: string) => {
+                        const date = new Date(value);
+                        return (
+                          !isNaN(date.getTime()) || 'Invalid date and time'
+                        );
+                      },
                     })}
                     error={errors.date}
                   />

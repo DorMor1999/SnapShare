@@ -8,12 +8,14 @@ import EventsPage from './pages/events/EventsPage';
 import LogInPage from './pages/login/LogInPage';
 import RagisterPage from './pages/register/RagisterPage';
 import NewEvent from './pages/NewEvent/NewEvent';
+import EditEvent from './pages/EditEvent/EditEvent';
 
 // context
 import { UserContext } from './context/UserContext';
 
 //my components
 import NavBar from './shared/components/NavBar/NavBar';
+
 
 
 function App() {
@@ -26,6 +28,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/new" element={<NewEvent />} />
+        <Route path="/events/edit/:eventId" element={<EditEvent />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );

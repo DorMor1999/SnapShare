@@ -70,7 +70,7 @@ const EventsPage: React.FC = () => {
                 type="button"
                 variant="primary"
                 size={'lg'}
-                link='/events/new'
+                link="/events/new"
               />
               <DropdownButton
                 id="dropdown-basic-button"
@@ -104,7 +104,6 @@ const EventsPage: React.FC = () => {
                   Name Ascending
                 </Dropdown.Item>
               </DropdownButton>
-              
             </div>
             <br />
           </Col>
@@ -123,7 +122,9 @@ const EventsPage: React.FC = () => {
                         Manage
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item href="#">Edit</Dropdown.Item>
+                        <Dropdown.Item href={`/events/edit/${event._id}`}>
+                          Edit
+                        </Dropdown.Item>
                         <Dropdown.Item href="#">View Attendees</Dropdown.Item>
                         <Dropdown.Item href="#">Delete</Dropdown.Item>
                       </Dropdown.Menu>
@@ -139,13 +140,16 @@ const EventsPage: React.FC = () => {
                 </div>
                 <div className="d-flex flex-column align-items-end">
                   <p className="mb-0">
-                    {new Date(event.date).toLocaleDateString('en-GB')}
+                    {new Date(event.date).toLocaleDateString('en-GB', {
+                      timeZone: 'UTC', // ⬅️ This ensures the date is also UTC-based
+                    })}
                   </p>
                   <p className="mb-0">
-                    {new Date(event.date).toLocaleTimeString([], {
-                      hour: 'numeric',
+                    {new Date(event.date).toLocaleTimeString('en-GB', {
+                      hour: '2-digit',
                       minute: '2-digit',
-                      hour12: true,
+                      hour12: false,
+                      timeZone: 'UTC', // ⬅️ This forces UTC
                     })}
                   </p>
                 </div>
