@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as InvitationDAL from '../dal/invitation.dal';
 import { findById } from '../dal/event.dal';
 import { getUserByEmailService } from '../services/user.service';
+import { sendEventInvitationEmail } from "../services/brevo.service";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -20,6 +21,12 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
     const user = await getUserByEmailService(req.body.email);
     const event = await findById(req.body.eventId);
+    if(!event){
+      res.status(400).json({
+        message: 'Event not exist',
+      });
+      return;
+    }
 
     if (user && event) {
       const userIdStr = user._id.toString();
@@ -35,6 +42,12 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     }
 
     const invitation = await InvitationDAL.createInvitation(req.body);
+    await sendEventInvitationEmail(
+      req.body.firstName,                                                     
+      req.body.lastName,            
+      req.body.email,                
+      event && typeof event.name === "string" ? event.name : "Unnamed Event"        
+    );
     res.status(201).json(invitation);
     return;
   } catch (err) {
