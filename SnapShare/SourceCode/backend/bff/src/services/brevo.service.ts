@@ -28,12 +28,12 @@ export const sendEventInvitationEmail = async (
         name: fullName,
       },
     ],
-    subject: `You're Invited to ${eventName} on SnapShare!`,
+    subject: `You're Invited to ${eventName} on SnapShare`,
     htmlContent: `
       <html>
       <body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
         <h1 style="margin-top: 15px;">Hello ${firstName},</h1>
-        <p>You're invited to <strong>${eventName}</strong>!</p>
+        <p>You're invited to <strong>${eventName}</strong> on SnapShare!</p>
 
         <p>If you're already registered, click <strong>Login</strong>. Otherwise, click <strong>Register</strong> below:</p>
 
