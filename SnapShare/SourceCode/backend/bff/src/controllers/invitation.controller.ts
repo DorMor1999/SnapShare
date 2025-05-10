@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as InvitationDAL from '../dal/invitation.dal';
 import { findById } from '../dal/event.dal';
 import { getUserByEmailService } from '../services/user.service';
-import { sendEventInvitationEmail } from "../services/brevo.service";
+import { sendEventInvitationEmail } from '../services/brevo.service';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -21,7 +21,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
     const user = await getUserByEmailService(req.body.email);
     const event = await findById(req.body.eventId);
-    if(!event){
+    if (!event) {
       res.status(400).json({
         message: 'Event not exist',
       });
@@ -43,10 +43,10 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
     const invitation = await InvitationDAL.createInvitation(req.body);
     await sendEventInvitationEmail(
-      req.body.firstName,                                                     
-      req.body.lastName,            
-      req.body.email,                
-      event && typeof event.name === "string" ? event.name : "Unnamed Event"        
+      req.body.firstName,
+      req.body.lastName,
+      req.body.email,
+      event && typeof event.name === 'string' ? event.name : 'Unnamed Event'
     );
     res.status(201).json(invitation);
     return;
@@ -115,6 +115,74 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     return;
   } catch (err) {
     res.status(500).json({ message: 'Error deleting invitation', error: err });
+    return;
+  }
+};
+
+export const getInvitationsByEvent = async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+    const { filterBy } = req.query;
+
+    const allowedStatuses = ['ACCEPTED', 'PENDING', 'DECLINED'] as const;
+
+    if (
+      filterBy &&
+      !allowedStatuses.includes(filterBy as (typeof allowedStatuses)[number])
+    ) {
+      res.status(400).json({ message: 'Invalid filterBy value' });
+      return;
+    }
+
+    const event = await findById(eventId);
+    if (!event) {
+      res.status(400).json({
+        message: 'Event not exist',
+      });
+      return;
+    }
+
+    const invitations = await InvitationDAL.findInvitationsByEvent(
+      eventId,
+      filterBy as string
+    );
+
+    res.status(200).json(invitations);
+    return;
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Failed to fetch invitations by event', error });
+    return;
+  }
+};
+
+export const getInvitationsByEmail = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.params;
+    const { filterBy } = req.query;
+
+    const allowedStatuses = ['ACCEPTED', 'PENDING', 'DECLINED'] as const;
+
+    if (
+      filterBy &&
+      !allowedStatuses.includes(filterBy as (typeof allowedStatuses)[number])
+    ) {
+      res.status(400).json({ message: 'Invalid filterBy value' });
+      return;
+    }
+
+    const invitations = await InvitationDAL.findInvitationsByEmail(
+      email,
+      filterBy as string
+    );
+
+    res.status(200).json(invitations);
+    return;
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Failed to fetch invitations by email', error });
     return;
   }
 };

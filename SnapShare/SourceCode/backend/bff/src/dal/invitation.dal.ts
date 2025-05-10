@@ -15,3 +15,23 @@ export const deleteInvitation = (id: string) => Invitation.findByIdAndDelete(id)
 export const findInvitation = async (filter: { email: string; eventId: string; status: string }) => {
   return Invitation.findOne(filter);  
 };
+
+export const findInvitationsByEvent = async (eventId: string, filterBy?: string) => {
+  const query: any = { eventId };
+
+  if (filterBy && ['ACCEPTED', 'PENDING', 'DECLINED'].includes(filterBy)) {
+    query.status = filterBy;
+  }
+
+  return Invitation.find(query).populate('eventId');
+};
+
+export const findInvitationsByEmail = async (email: string, filterBy?: string) => {
+  const query: any = { email: email.toLowerCase().trim() };
+
+  if (filterBy && ['ACCEPTED', 'PENDING', 'DECLINED'].includes(filterBy)) {
+    query.status = filterBy;
+  }
+
+  return Invitation.find(query).populate('eventId');
+};
