@@ -74,3 +74,7 @@ export const acceptInvitation = async (invitationId: string) => {
     throw error;
   }
 };
+
+export const createManyInvitations = async (invitations: any[]) => {
+  return Invitation.insertMany(invitations);
+};

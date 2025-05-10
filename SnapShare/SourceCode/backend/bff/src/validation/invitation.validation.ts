@@ -25,9 +25,6 @@ export const createInvitationSchema = Joi.object({
     "string.empty": "Type is required",
     "any.required": "Type is required",
   }),
-  status: Joi.string().valid("ACCEPTED", "PENDING", "DECLINED").optional().messages({
-    "any.only": "Status must be one of ACCEPTED, PENDING, or DECLINED",
-  }),
 });
 
 export const updateInvitationSchema = Joi.object({

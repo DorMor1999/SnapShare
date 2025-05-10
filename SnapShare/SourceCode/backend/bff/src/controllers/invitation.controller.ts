@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import * as InvitationDAL from '../dal/invitation.dal';
 import { findById } from '../dal/event.dal';
-import { getUserByEmailService, getUserByIdService } from '../services/user.service';
+import { getUserByEmailService } from '../services/user.service';
 import { sendEventInvitationEmail } from '../services/brevo.service';
+import { extractInvitationsFromExcel } from '../services/excel.service';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -187,10 +188,7 @@ export const getInvitationsByEmail = async (req: Request, res: Response) => {
   }
 };
 
-export const acceptInvitation = async (
-  req: Request,
-  res: Response
-) => {
+export const acceptInvitation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -201,6 +199,92 @@ export const acceptInvitation = async (
     res
       .status(500)
       .json({ message: error.message || 'Failed to accept invitation' });
+    return;
+  }
+};
+
+export const createBatchInvitations = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.file || !req.file.buffer) {
+      res.status(400).json({ message: 'Excel file is required' });
+      return;
+    }
+
+    const eventId = req.body.eventId;
+    if (!eventId) {
+      res.status(400).json({ message: 'Event ID is required' });
+      return;
+    }
+
+    // Extract and validate invitations from the uploaded Excel file
+    const invitationsData = extractInvitationsFromExcel(
+      req.file.buffer,
+      eventId
+    );
+
+    // Validate all invitations before inserting
+    for (const invitation of invitationsData) {
+      const existing = await InvitationDAL.findInvitation({
+        email: invitation.email,
+        eventId: invitation.eventId,
+        status: 'PENDING',
+      });
+
+      if (existing) {
+        throw new Error(
+          `Pending invitation already exists for ${invitation.email} in event ${invitation.eventId}`
+        );
+      }
+
+      const user = await getUserByEmailService(invitation.email);
+      const event = await findById(invitation.eventId);
+      if (!event) throw new Error(`Event not found: ${invitation.eventId}`);
+
+      if (user) {
+        const userId = user._id.toString();
+        if (
+          event.owners.some((o) => o.toString() === userId) ||
+          event.participants.some((p) => p.toString() === userId)
+        ) {
+          throw new Error(
+            `User ${invitation.email} is already in event ${invitation.eventId}`
+          );
+        }
+      }
+    }
+
+    // All validated, create invitations
+    const createdInvitations = await InvitationDAL.createManyInvitations(
+      invitationsData
+    );
+
+    //send emails
+    for(let invitationData of invitationsData){
+      const event = await findById(invitationData.eventId);
+      await sendEventInvitationEmail(
+      invitationData.firstName,
+      invitationData.lastName,
+      invitationData.email,
+      event && typeof event.name === 'string' ? event.name : 'Unnamed Event'
+    );
+    }
+    res
+      .status(201)
+      .json({
+        message: 'Invitations created successfully',
+        invitations: createdInvitations,
+      });
+    return;
+  } catch (error) {
+    res
+      .status(400)
+      .json({
+        message: 'Batch invitation creation failed',
+        error: error instanceof Error ? error.message : error,
+      });
     return;
   }
 };
