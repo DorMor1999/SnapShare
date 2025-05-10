@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middlewares/auth.middleware';
-import {create, getAll, getById, remove, update, getInvitationsByEvent, getInvitationsByEmail} from '../controllers/invitation.controller';
+import {create, getAll, getById, remove, update, getInvitationsByEvent, getInvitationsByEmail, acceptInvitation} from '../controllers/invitation.controller';
 import { validateRequest } from '../middlewares/validations.middleware';
 import {
   createInvitationSchema,
@@ -19,5 +19,6 @@ router.put('/:id', validateRequest(updateInvitationSchema), update);
 router.delete('/:id', remove);
 router.get('/event/:eventId', getInvitationsByEvent);
 router.get('/email/:email', getInvitationsByEmail);
+router.post('/:id/accept', acceptInvitation);
 
 export default router;

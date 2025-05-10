@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as InvitationDAL from '../dal/invitation.dal';
 import { findById } from '../dal/event.dal';
-import { getUserByEmailService } from '../services/user.service';
+import { getUserByEmailService, getUserByIdService } from '../services/user.service';
 import { sendEventInvitationEmail } from '../services/brevo.service';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
@@ -183,6 +183,24 @@ export const getInvitationsByEmail = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: 'Failed to fetch invitations by email', error });
+    return;
+  }
+};
+
+export const acceptInvitation = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const result = await InvitationDAL.acceptInvitation(id);
+    res.status(200).json({ message: 'Invitation accepted', result });
+    return;
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: error.message || 'Failed to accept invitation' });
     return;
   }
 };

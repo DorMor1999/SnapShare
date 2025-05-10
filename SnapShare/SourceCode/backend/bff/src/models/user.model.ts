@@ -15,7 +15,7 @@ const UserSchema: Schema = new Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, lowercase: true, unique: true },
     profilePhotosUrls: [{ type: [String], required: false }],
     profilePhotosEncoding: { type: [Schema.Types.Mixed], required: false },
     hashedPassword: { type: String, required: true },
