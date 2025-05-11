@@ -7,7 +7,6 @@ export const sendEventInvitationEmail = async (
   eventName: string
 ): Promise<void> => {
   const apiKey = process.env.BREVO_API_KEY;
-  console.log('apiKey: ' + apiKey);
   const senderEmail = 'snapsharesup@gmail.com';
   const senderName = 'SnapShare';
 

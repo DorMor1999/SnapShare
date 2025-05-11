@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as InvitationDAL from '../dal/invitation.dal';
 import { findById } from '../dal/event.dal';
 import { getUserByEmailService } from '../services/user.service';
-import { sendEventInvitationEmail } from '../services/brevo.service';
+import { sendEventInvitationEmail } from '../services/email.service';
 import { extractInvitationsFromExcel } from '../services/excel.service';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
