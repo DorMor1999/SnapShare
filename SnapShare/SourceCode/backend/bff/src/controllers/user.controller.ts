@@ -1,17 +1,11 @@
 import { Request, Response } from "express";
-import {
-  getAllUsersService,
-  getUserByIdService,
-  createUserService,
-  updateUserByIdService,
-  deleteUserByIdService,
-} from "../services/user.service";
+import * as UserService from "../services/user.service";
 import { mapUserToDto, mapUsersToDtos, mapDtoToUser } from "../mappers/user.mapper";
 
 // Get all users
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await getAllUsersService();
+    const users = await UserService.getAllUsers();
     const userDtos = mapUsersToDtos(users);
     res.status(200).json(userDtos);
   } catch (error) {
@@ -23,7 +17,7 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const user = await getUserByIdService(id);
+    const user = await UserService.getUserById(id);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -39,7 +33,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = mapDtoToUser(req.body);
-    const newUser = await createUserService(userData);
+    const newUser = await UserService.createUser(userData);
     const newUserDto = mapUserToDto(newUser);
     res.status(201).json(newUserDto);
   } catch (error) {
@@ -52,7 +46,7 @@ export const updateUserById = async (req: Request, res: Response): Promise<void>
   try {
     const { id } = req.params;
     const updatedData = mapDtoToUser(req.body);
-    const updatedUser = await updateUserByIdService(id, updatedData);
+    const updatedUser = await UserService.updateUserById(id, updatedData);
     if (!updatedUser) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -68,7 +62,7 @@ export const updateUserById = async (req: Request, res: Response): Promise<void>
 export const deleteUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deletedUser = await deleteUserByIdService(id);
+    const deletedUser = await UserService.deleteUserById(id);
     if (!deletedUser) {
       res.status(404).json({ message: "User not found" });
       return;

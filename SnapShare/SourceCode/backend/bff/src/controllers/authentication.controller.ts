@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createUserService, deleteUserByIdService, updateUserByIdService } from "../services/user.service";
-import { getUserByEmailService } from "../services/user.service";
+import { createUser, deleteUserById, updateUserById } from "../services/user.service";
+import { getUserByEmail } from "../services/user.service";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { IUserDto } from "../models/dtos/user.dto";
@@ -26,10 +26,10 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
         
         // Create the user
         let userToCreate: Partial<IUser> = mapDtoToUser(user); // Map the DTO to the user model
-        const newUser: IUser = await createUserService(userToCreate);
+        const newUser: IUser = await createUser(userToCreate);
         
         // Upload files to Azure Blob Storage
-        const uploadedPhotoUrls = await uploadProfilePhotosToBlobStorage(newUser._id, files, process.env.AZURE_STORAGE_CONTAINER_NAME_PROFILE_PHOTOS || "");
+        const uploadedPhotoUrls = await uploadProfilePhotosToBlobStorage(newUser._id, files, process.env.AZURE_STORAGE_CONTAINER_NAME || "");
         if (!uploadedPhotoUrls) {
             res.status(500).json({ message: "Failed to upload photos" });
             return;
@@ -41,9 +41,9 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
             newUser.profilePhotosEncoding = encodingResponse.data.encoding;
         }
         
-        let updatedUser: IUser|null = await updateUserByIdService(newUser._id.toString(), newUser); // Update the user with the encoding data
+        let updatedUser: IUser|null = await updateUserById(newUser._id.toString(), newUser); // Update the user with the encoding data
         if(updatedUser == null) {
-            await deleteUserByIdService(newUser._id.toString()); 
+            await deleteUserById(newUser._id.toString()); 
             res.status(500).json({ message: "Failed to update user with encoding data" });
             return;
         }
@@ -61,7 +61,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         const { email, password } = req.body;
 
         // Find the user by email
-        const user = await getUserByEmailService(email);
+        const user = await getUserByEmail(email);
         if (!user) {
             res.status(404).json({ message: "User not found" });
             return;
@@ -76,7 +76,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
         // Generate a JWT token
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET_KEY || "secret", {
-            expiresIn: process.env.JWT_EXPIRATION_TIME || "1h",
+            expiresIn: process.env.JWT_EXPIRATION_TIME || "5h",
         });
 
         res.status(200).json({ message: "Login successful", token, id: user._id }); 

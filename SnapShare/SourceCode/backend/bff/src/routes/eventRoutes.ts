@@ -13,6 +13,8 @@ import {
   updateEventSchema,
 } from '../validation/event.validation';
 import { validateRequest } from '../middlewares/validations.middleware';
+import { uploadEventPhotos } from "../controllers/event.controller";
+import { parseFormData } from "../middlewares/multer.middleware";
 
 const router = Router();
 
@@ -26,5 +28,6 @@ router.get('/:id', getEventById);
 router.put('/:id', validateRequest(updateEventSchema), updateEventById);
 router.delete('/:id', deleteEventById);
 router.get('/user/:userId', getUserEvents);
+router.post("/:eventId/photos", parseFormData, uploadEventPhotos);
 
 export default router;

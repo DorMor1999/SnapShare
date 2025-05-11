@@ -1,22 +1,16 @@
-import Event from '../models/event.model';
+import Event, { IEvent } from '../models/event.model';
 import { Types } from 'mongoose';
 import { SortOrder } from 'mongoose';
 
 export const findAll = () => {
-  return Event.find().lean();
+  return Event.find();
 };
 
 export const findById = (id: string) => {
-  return Event.findById(id).lean();
+  return Event.findById(id);
 };
 
-export const create = (data: {
-  name: string;
-  date: Date;
-  owners: Types.ObjectId[];
-  participants: Types.ObjectId[];
-  photoGroups: Types.ObjectId[];
-}) => {
+export const create = (data: Partial<IEvent>) => {
   return Event.create(data);
 };
 

@@ -1,17 +1,13 @@
 import { Request, Response, RequestHandler } from 'express';
-import * as eventDal from '../dal/event.dal';
-import { SortOrder } from 'mongoose';
-import { getUserByIdService } from '../services/user.service';
+import { getUserById } from '../services/user.service';
+import * as EventService from '../services/event.service';
 
-
-export const getAllEvents = async (req: Request, res: Response) => {
+export const getAllEvents: RequestHandler = async (req, res) => {
   try {
-    const events = await eventDal.findAll();
+    const events = await EventService.getAllEvents();
     res.json(events);
-    return;
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching events', error: err });
-    return;
+    res.status(500).json({ message: "Error fetching events", error: err });
   }
 };
 
@@ -22,7 +18,7 @@ export const createEvent: RequestHandler = async (
   try {
     const { name, date, ownerId } = req.body;
 
-    const user = await getUserByIdService(ownerId);
+    const user = await getUserById(ownerId);
     if(!user){
       res.status(400).json({
         message: 'User not exist',
@@ -30,7 +26,7 @@ export const createEvent: RequestHandler = async (
       return;
     }
 
-    const newEvent = await eventDal.create({
+    const newEvent = await EventService.createEvent({
       name,
       date,
       owners: [ownerId],
@@ -39,100 +35,92 @@ export const createEvent: RequestHandler = async (
     });
 
     res.status(201).json(newEvent);
-    return;
   } catch (err) {
-    res.status(500).json({ message: 'Error creating event', error: err });
-    return;
+    res.status(500).json({ message: "Error creating event", error: err });
   }
 };
 
-export const getEventById: RequestHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getEventById: RequestHandler = async (req, res) => {
   try {
-    const event = await eventDal.findById(req.params.id);
+    const event = await EventService.getEventById(req.params.id);
     if (!event) {
-      res.status(404).json({ message: 'Event not found' });
+      res.status(404).json({ message: "Event not found" });
       return;
     }
     res.json(event);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching event', error: err });
-    return;
+    res.status(500).json({ message: "Error fetching event", error: err });
   }
 };
 
-export const updateEventById: RequestHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const updateEventById: RequestHandler = async (req, res) => {
   try {
-    const updatedEvent = await eventDal.update(req.params.id, req.body);
+    const updatedEvent = await EventService.updateEventById(req.params.id, req.body);
     if (!updatedEvent) {
-      res.status(404).json({ message: 'Event not found' });
+      res.status(404).json({ message: "Event not found" });
       return;
     }
     res.json(updatedEvent);
-    return;
   } catch (err) {
-    res.status(500).json({ message: 'Error updating event', error: err });
-    return;
+    res.status(500).json({ message: "Error updating event", error: err });
   }
 };
 
-export const deleteEventById: RequestHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const deleteEventById: RequestHandler = async (req, res) => {
   try {
-    const deleted = await eventDal.remove(req.params.id);
+    const deleted = await EventService.deleteEventById(req.params.id);
     if (!deleted) {
-      res.status(404).json({ message: 'Event not found' });
+      res.status(404).json({ message: "Event not found" });
       return;
     }
-    res.json({ message: 'Event deleted successfully' });
-    return;
+    res.json({ message: "Event deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: 'Error deleting event', error: err });
-    return;
+    res.status(500).json({ message: "Error deleting event", error: err });
   }
 };
 
-export const getUserEvents: RequestHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getUserEvents: RequestHandler = async (req, res) => {
   const { userId } = req.params;
-  const { sortBy = 'date', orderBy = 'asc' } = req.query;
+  const { sortBy = "date", orderBy = "asc" } = req.query;
 
-  // Define valid fields for sorting
-  const validSortFields = ['date', 'name'];
-
-  // Ensure sortBy is a valid field
+  const validSortFields = ["date", "name"];
   if (!validSortFields.includes(sortBy as string)) {
-    res.status(400).json({ message: 'Invalid sort field.' });
+    res.status(400).json({ message: "Invalid sort field." });
     return;
   }
 
-  // Ensure orderBy is either 'asc' or 'desc'
-  const sortOrder: SortOrder = orderBy === 'desc' ? -1 : 1;
-
-  console.log(sortBy, sortOrder);
+  const sortOrder = orderBy === "desc" ? -1 : 1;
 
   try {
-    const events = await eventDal.findByUserIdSorted(
-      userId,
-      sortBy as string,
-      sortOrder
-    );
+    const events = await EventService.getUserEvents(userId, sortBy as string, sortOrder);
     res.json(events);
-    return;
   } catch (error) {
-    res.status(500).json({
-      message: 'Failed to fetch user events',
-      error,
-    });
+    res.status(500).json({ message: "Failed to fetch user events", error });
+  }
+};
+
+export const uploadEventPhotos: RequestHandler = async (req, res) => {
+  const { eventId } = req.params;
+  const files = req.files as Express.Multer.File[];
+
+  if (!files || files.length === 0) {
+    res.status(400).json({ message: "No files uploaded." });
     return;
+  }
+
+  try {
+    const updatedEvent = await EventService.uploadEventPhotos(eventId, files);
+
+    if (!updatedEvent) {
+      res.status(404).json({ message: "Event not found." });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Photos uploaded successfully.",
+      event: updatedEvent,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to upload photos.", error });
   }
 };

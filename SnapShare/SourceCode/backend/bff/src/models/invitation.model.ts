@@ -1,4 +1,15 @@
-import { Schema, model, Types } from 'mongoose';
+import mongoose, { Schema, model, Types } from 'mongoose';
+
+export interface IInvitation extends Document {
+  eventId: Types.ObjectId;
+  email: string;
+  firstName: string;
+  lastName: string;
+  type: 'OWNER' | 'PARTICIPANT';
+  status: 'ACCEPTED' | 'PENDING' | 'DECLINED';
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const invitationSchema = new Schema(
   {
@@ -20,4 +31,6 @@ const invitationSchema = new Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-export const Invitation = model('Invitation', invitationSchema);
+const Invitation = mongoose.model<IInvitation>("Invitation", invitationSchema);
+
+export default Invitation;

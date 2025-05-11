@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as InvitationDAL from '../dal/invitation.dal';
 import { findById } from '../dal/event.dal';
-import { getUserByEmailService } from '../services/user.service';
+import { getUserByEmail } from '../services/user.service';
 import { sendEventInvitationEmail } from '../services/email.service';
 import { extractInvitationsFromExcel } from '../services/excel.service';
 
@@ -20,7 +20,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await getUserByEmailService(req.body.email);
+    const user = await getUserByEmail(req.body.email);
     const event = await findById(req.body.eventId);
     if (!event) {
       res.status(400).json({
@@ -239,7 +239,7 @@ export const createBatchInvitations = async (
         );
       }
 
-      const user = await getUserByEmailService(invitation.email);
+      const user = await getUserByEmail(invitation.email);
       const event = await findById(invitation.eventId);
       if (!event) throw new Error(`Event not found: ${invitation.eventId}`);
 

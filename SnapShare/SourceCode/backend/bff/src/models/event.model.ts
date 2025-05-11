@@ -1,4 +1,14 @@
-import { Schema, model, Types } from "mongoose";
+import mongoose, { Schema, model, Types } from "mongoose";
+
+export interface IEvent extends Document {
+  name: string;
+  date: Date;
+  owners: Types.ObjectId[];
+  participants: Types.ObjectId[];
+  photoGroups: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const eventSchema = new Schema(
   {
@@ -37,6 +47,6 @@ const eventSchema = new Schema(
   }
 );
 
-const Event = model("Event", eventSchema);
+const Event = mongoose.model<IEvent>("Event", eventSchema);
 
 export default Event;
