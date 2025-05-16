@@ -1,80 +1,49 @@
-import { Invitation } from '../models/invitation.model';
-import Event from '../models/event.model';
-import User from '../models/user.model';
-import mongoose from 'mongoose';
+import { Invitation, IInvitation } from '../models/invitation.model';
 
-export const createInvitation = (data: any) => Invitation.create(data);
+import { FilterQuery } from 'mongoose';
 
-export const getInvitations = () => Invitation.find();
-
-export const getInvitationById = (id: string) => Invitation.findById(id);
-
-export const updateInvitation = (id: string, data: any) =>
-  Invitation.findByIdAndUpdate(id, data, { new: true });
-
-export const deleteInvitation = (id: string) => Invitation.findByIdAndDelete(id);
-
-
-export const findInvitation = async (filter: { email: string; eventId: string; status: string }) => {
-  return Invitation.findOne(filter);  
+export const createInvitation = async (data: Partial<IInvitation>, session: any): Promise<IInvitation> => {
+  const invitation = new Invitation(data);
+  return await invitation.save({ session });
 };
 
-export const findInvitationsByEvent = async (eventId: string, filterBy?: string) => {
+export const getInvitations = async (): Promise<IInvitation[]> => {
+  return await Invitation.find();
+};
+
+export const getInvitationById = async (id: string): Promise<IInvitation | null> => {
+  return await Invitation.findById(id);
+};
+
+export const updateInvitation = async (id: string, updateData: Partial<IInvitation>): Promise<IInvitation | null> => {
+  return await Invitation.findByIdAndUpdate(id, updateData, { new: true });
+};
+
+export const deleteInvitation = async (id: string): Promise<boolean> => {
+  const result = await Invitation.findByIdAndDelete(id);
+  return !!result;
+};
+
+export const findInvitation = async (query: Partial<IInvitation>): Promise<IInvitation | null> => {
+  return await Invitation.findOne(query as FilterQuery<IInvitation>);
+};
+
+export const findInvitationsByEvent = async (eventId: string, filterBy?: string): Promise<IInvitation[]> => {
   const query: any = { eventId };
-
-  if (filterBy && ['ACCEPTED', 'PENDING', 'DECLINED'].includes(filterBy)) {
-    query.status = filterBy;
-  }
-
-  return Invitation.find(query).populate('eventId');
+  if (filterBy) query.status = filterBy;
+  return await Invitation.find(query);
 };
 
-export const findInvitationsByEmail = async (email: string, filterBy?: string) => {
-  const query: any = { email: email.toLowerCase().trim() };
-
-  if (filterBy && ['ACCEPTED', 'PENDING', 'DECLINED'].includes(filterBy)) {
-    query.status = filterBy;
-  }
-
-  return Invitation.find(query).populate('eventId');
+export const findInvitationsByEmail = async (email: string, filterBy?: string): Promise<IInvitation[]> => {
+  const query: any = { email };
+  if (filterBy) query.status = filterBy;
+  return await Invitation.find(query);
 };
 
-
-export const acceptInvitation = async (invitationId: string) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
-    const invitation = await Invitation.findById(invitationId).session(session);
-    if (!invitation) throw new Error('Invitation not found');
-    if (invitation.status !== 'PENDING') throw new Error('Only pending invitations can be accepted');
-
-    const user = await User.findOne({ email: invitation.email }).session(session);
-    if (!user) throw new Error('User with this email not found');
-
-    // Update invitation status
-    invitation.status = 'ACCEPTED';
-    await invitation.save({ session });
-
-    // Add userId to appropriate array in Event
-    const updateField =
-      invitation.type === 'OWNER'
-        ? { $addToSet: { owners: user._id } }
-        : { $addToSet: { participants: user._id } };
-
-    await Event.findByIdAndUpdate(invitation.eventId, updateField, { session });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return { success: true };
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
-  }
+export const acceptInvitation = async (id: string, session: any): Promise<IInvitation | null> => {
+  return await Invitation.findByIdAndUpdate(id, { status: "ACCEPTED" }, { new: true, session }) as IInvitation | null;
 };
 
-export const createManyInvitations = async (invitations: any[]) => {
-  return Invitation.insertMany(invitations);
+export const createManyInvitations = async (data: Partial<IInvitation>[], session: any): Promise<Partial<IInvitation>[]> => {
+  return await Invitation.insertMany(data, { session });
 };

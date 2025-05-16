@@ -21,11 +21,16 @@ export const update = (
   return Event.findByIdAndUpdate(id, updates, { new: true });
 };
 
+export const updateEventSetById = async (id: string, updateField: any, session: any) => {
+  await Event.findByIdAndUpdate(id, updateField, { session });
+}
+
+
 export const remove = (id: string) => {
   return Event.findByIdAndDelete(id);
 };
 
-export const findByUserIdSorted = async (
+export const findUserEventsByUserIdSorted = async (
   userId: string,
   sortBy: string,
   sortOrder: SortOrder

@@ -1,6 +1,7 @@
-import mongoose, { Schema, model, Types } from 'mongoose';
+import mongoose, { Schema, model, Types, Document } from "mongoose";
 
 export interface IInvitation extends Document {
+  _id: mongoose.Types.ObjectId;
   eventId: Types.ObjectId;
   email: string;
   firstName: string;
@@ -11,9 +12,9 @@ export interface IInvitation extends Document {
   updatedAt: Date;
 }
 
-const invitationSchema = new Schema(
+const invitationSchema = new Schema<IInvitation>(
   {
-    eventId: { type: Types.ObjectId, ref: 'Event', required: true },
+    eventId: { type: Schema.Types.ObjectId, ref: "Event", required: true },
     email: { type: String, required: true, lowercase: true, trim: true },
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
@@ -31,6 +32,4 @@ const invitationSchema = new Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-const Invitation = mongoose.model<IInvitation>("Invitation", invitationSchema);
-
-export default Invitation;
+export const Invitation = model<IInvitation>("Invitation", invitationSchema);

@@ -10,7 +10,7 @@ export interface IEvent extends Document {
   updatedAt: Date;
 }
 
-const eventSchema = new Schema(
+const eventSchema = new Schema<IEvent>(
   {
     name: {
       type: String,

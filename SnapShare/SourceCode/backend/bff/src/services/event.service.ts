@@ -27,8 +27,8 @@ export const getUserEvents = async (
   userId: string,
   sortBy: string,
   sortOrder: SortOrder
-): Promise<IEvent[]> => {
-  return await eventDal.findByUserIdSorted(userId, sortBy, sortOrder);
+): Promise<Partial<IEvent>[]> => {
+  return await eventDal.findUserEventsByUserIdSorted(userId, sortBy, sortOrder);
 };
 
 export const uploadEventPhotos = async (eventId: string, photos: Express.Multer.File[]): Promise<IEvent | null> => {
@@ -37,7 +37,7 @@ export const uploadEventPhotos = async (eventId: string, photos: Express.Multer.
   if (!event) {
     return null;
   }
-  
+
   event.updatedAt = new Date(); 
   uploadEventFiles(photos, eventId);
 

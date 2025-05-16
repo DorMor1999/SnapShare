@@ -34,3 +34,13 @@ export const uploadEventFiles = async (
     throw new Error("Failed to upload files to Azure Blob Storage");
   }
 };
+
+export const getPhotosByEventId = async (eventId: string): Promise<IPhoto[]> => {
+  try {
+    const photos = await getPhotosByEventId(eventId);
+    return photos;
+  } catch (error) {
+    console.error("Error retrieving photos by event ID:", error);
+    throw new Error("Failed to retrieve photos by event ID");
+  }
+};

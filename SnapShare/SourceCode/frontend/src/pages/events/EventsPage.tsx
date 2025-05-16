@@ -125,7 +125,9 @@ const EventsPage: React.FC = () => {
                         <Dropdown.Item href={`/events/edit/${event._id}`}>
                           Edit
                         </Dropdown.Item>
-                        <Dropdown.Item href="#">View Attendees</Dropdown.Item>
+                        <Dropdown.Item href="#">My Photos</Dropdown.Item>
+                        <Dropdown.Item href="#">All Photos</Dropdown.Item>
+                        <Dropdown.Item href="#">Owners and Participants</Dropdown.Item>
                         <Dropdown.Item href="#">Delete</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
