@@ -65,7 +65,7 @@ const NavLinkInvitations: React.FC<NavLinkInvitationsProps> = ({
       {loading && <SpinnerOverlay />}
       <Nav.Link onClick={() => moveToOtherPage('/invitations')}>
         Invitations{' '}
-        {data && data?.length > 0 && (
+        {data && data.length > 0 && (
           <Badge className={classes['invitations-badge']} pill bg="danger">
             {data.length}
           </Badge>

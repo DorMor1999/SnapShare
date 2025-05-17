@@ -54,6 +54,61 @@ const EventsPage: React.FC = () => {
     );
   }, [token, userId]);
 
+  let content;
+  if (data && data.length > 0) {
+    content = data?.map((event) => (
+      <Col key={event._id} md={12} lg={6} className="mb-3">
+        <div className="p-3 border rounded shadow-sm d-flex justify-content-between">
+          <div>
+            <h5>{event.name}</h5>
+            {event.isOwner ? (
+              <Dropdown>
+                <Dropdown.Toggle variant="primary" id={`dropdown-${event._id}`}>
+                  Manage
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item href={`/events/edit/${event._id}`}>
+                    Edit
+                  </Dropdown.Item>
+                  <Dropdown.Item href="#">My Photos</Dropdown.Item>
+                  <Dropdown.Item href="#">All Photos</Dropdown.Item>
+                  <Dropdown.Item href="#">
+                    Owners and Participants
+                  </Dropdown.Item>
+                  <Dropdown.Item href="#">Delete</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            ) : (
+              <MyButton
+                text="View"
+                type="button"
+                variant="primary"
+                size={undefined}
+              />
+            )}
+          </div>
+          <div className="d-flex flex-column align-items-end">
+            <p className="mb-0">
+              {new Date(event.date).toLocaleDateString('en-GB', {
+                timeZone: 'UTC', // ⬅️ This ensures the date is also UTC-based
+              })}
+            </p>
+            <p className="mb-0">
+              {new Date(event.date).toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: 'UTC', // ⬅️ This forces UTC
+              })}
+            </p>
+          </div>
+        </div>
+      </Col>
+    ));
+  } else {
+    content = <h4>You have 0 events!</h4>;
+  }
+
   return (
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
@@ -107,57 +162,7 @@ const EventsPage: React.FC = () => {
             </div>
             <br />
           </Col>
-
-          {data?.map((event) => (
-            <Col key={event._id} md={12} lg={6} className="mb-3">
-              <div className="p-3 border rounded shadow-sm d-flex justify-content-between">
-                <div>
-                  <h5>{event.name}</h5>
-                  {event.isOwner ? (
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        variant="primary"
-                        id={`dropdown-${event._id}`}
-                      >
-                        Manage
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href={`/events/edit/${event._id}`}>
-                          Edit
-                        </Dropdown.Item>
-                        <Dropdown.Item href="#">My Photos</Dropdown.Item>
-                        <Dropdown.Item href="#">All Photos</Dropdown.Item>
-                        <Dropdown.Item href="#">Owners and Participants</Dropdown.Item>
-                        <Dropdown.Item href="#">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  ) : (
-                    <MyButton
-                      text="View"
-                      type="button"
-                      variant="primary"
-                      size={undefined}
-                    />
-                  )}
-                </div>
-                <div className="d-flex flex-column align-items-end">
-                  <p className="mb-0">
-                    {new Date(event.date).toLocaleDateString('en-GB', {
-                      timeZone: 'UTC', // ⬅️ This ensures the date is also UTC-based
-                    })}
-                  </p>
-                  <p className="mb-0">
-                    {new Date(event.date).toLocaleTimeString('en-GB', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: false,
-                      timeZone: 'UTC', // ⬅️ This forces UTC
-                    })}
-                  </p>
-                </div>
-              </div>
-            </Col>
-          ))}
+          {content}
         </Row>
       </Wrapper>
     </Fragment>
