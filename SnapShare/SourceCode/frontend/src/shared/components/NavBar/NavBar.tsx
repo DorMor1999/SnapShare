@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import Badge from 'react-bootstrap/Badge';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 
 //my imports
@@ -18,6 +17,9 @@ import LogInIcon from '../UI/Icons/LogInIcon';
 import PersonPlusIcon from '../UI/Icons/PersonPlusIcon';
 import { UserContext } from '../../../context/UserContext';
 import useHttpRequest from '../../../hooks/useHttpRequest';
+import NavLinkInvitations from './components/NavLinkInvitations/NavLinkInvitations';
+import ErrorModal from '../UI/Modal/ErrorModal';
+import SpinnerOverlay from '../UI/Spinner/SpinnerOverlay';
 
 type UserProfile = {
   email: string;
@@ -56,7 +58,6 @@ const NavBar: React.FC = () => {
 
   let content;
   if (isConnected) {
-    const pendingInvitations: number = 5;
     const fullName: string = `${data?.firstName} ${data?.lastName}`;
 
     content = (
@@ -65,15 +66,12 @@ const NavBar: React.FC = () => {
           <Nav.Link className={classes['disabled-link-full-name']}>
             {fullName}
           </Nav.Link>
-          <Nav.Link onClick={() => moveToOtherPage('/events?sortBy=date&orderBy=desc')}>Events</Nav.Link>
-          <Nav.Link>
-            Invitations{' '}
-            {pendingInvitations > 0 && (
-              <Badge className={classes['invitations-badge']} pill bg="danger">
-                {pendingInvitations}
-              </Badge>
-            )}
+          <Nav.Link
+            onClick={() => moveToOtherPage('/events?sortBy=date&orderBy=desc')}
+          >
+            Events
           </Nav.Link>
+          <NavLinkInvitations userEmail={data?.email} />
           <NavDropdown
             title={
               <Fragment>
@@ -115,29 +113,35 @@ const NavBar: React.FC = () => {
   }
 
   return (
-    <Navbar
-      collapseOnSelect
-      expand="lg"
-      className={`bg-light light-theme`}
-      data-bs-theme="light"
-    >
-      <Container>
-        <Nav.Link>
-          <Navbar.Brand onClick={() => moveToOtherPage('/')}>
-            <img
-              src={logo}
-              width="35"
-              height="35"
-              className="d-inline-block align-top"
-              alt="React Bootstrap logo"
-            />{' '}
-            SnapShare
-          </Navbar.Brand>
-        </Nav.Link>
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">{content}</Navbar.Collapse>
-      </Container>
-    </Navbar>
+    <Fragment>
+      {error && <ErrorModal message={error} onClose={clearError} />}
+      {loading && <SpinnerOverlay />}
+      <Navbar
+        collapseOnSelect
+        expand="lg"
+        className={`bg-light light-theme`}
+        data-bs-theme="light"
+      >
+        <Container>
+          <Nav.Link>
+            <Navbar.Brand onClick={() => moveToOtherPage('/')}>
+              <img
+                src={logo}
+                width="35"
+                height="35"
+                className="d-inline-block align-top"
+                alt="React Bootstrap logo"
+              />{' '}
+              SnapShare
+            </Navbar.Brand>
+          </Nav.Link>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav">
+            {content}
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </Fragment>
   );
 };
 

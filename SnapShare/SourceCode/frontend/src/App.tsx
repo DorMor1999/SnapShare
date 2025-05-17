@@ -11,12 +11,14 @@ import NewEventPage from './pages/NewEvent/NewEventPage';
 import EditEventPage from './pages/EditEvent/EditEventPage';
 import SendInvitationPage from './pages/SendInvitation/SendInvitationPage';
 import SendInvitationsPage from './pages/SendInvitations/SendInvitationsPage';
+import InvitationsPage from './pages/Invitations/InvitationsPage';
 
 // context
 import { UserContext } from './context/UserContext';
 
 //my components
 import NavBar from './shared/components/NavBar/NavBar';
+
 
 
 
@@ -29,6 +31,7 @@ function App() {
     routes = (
       <Fragment>
         <Route path="/" element={<HomePage />} />
+        <Route path="/invitations" element={<InvitationsPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/new" element={<NewEventPage />} />
         <Route path="/events/edit/:eventId" element={<EditEventPage />} />

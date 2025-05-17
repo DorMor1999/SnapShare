@@ -16,12 +16,13 @@ import { UserContext } from '../../context/UserContext';
 // bootstrap imports
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { InvitationType } from '../../shared/types/InvitationType';
 
 type FormData = {
   firstName: string;
   lastName: string;
   email: string;
-  type: 'OWNER' | 'PARTICIPANT';
+  type: InvitationType;
 };
 
 const SendInvitationPage: React.FC = () => {
