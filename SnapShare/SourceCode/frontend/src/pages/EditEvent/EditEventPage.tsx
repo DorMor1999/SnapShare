@@ -18,7 +18,7 @@ export type EventResponse = {
   __v: number;
 };
 
-const EditEvent: React.FC = () => {
+const EditEventPage: React.FC = () => {
   const { eventId } = useParams();
   const { token } = useContext(UserContext);
 
@@ -62,4 +62,4 @@ const EditEvent: React.FC = () => {
   );
 };
 
-export default EditEvent;
+export default EditEventPage;

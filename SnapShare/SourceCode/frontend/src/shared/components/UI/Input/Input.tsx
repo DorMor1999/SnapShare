@@ -1,54 +1,65 @@
 import React, { Fragment } from 'react';
-
-// Bootstrap imports
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-
-// Import FieldError from react-hook-form
 import { FieldError } from 'react-hook-form';
+
+type Option = {
+  label: string;
+  value: string | number;
+};
 
 type InputProps = {
   label: string;
   type: string;
   required?: boolean;
-  error?: FieldError; // More explicit type for error
-} & React.ComponentPropsWithoutRef<typeof Form.Control>; // Pass all Form.Control props (except file-specific ones)
+  error?: FieldError;
+  options?: Option[]; // Only used when type === 'select'
+} & React.ComponentPropsWithoutRef<typeof Form.Control>;
 
 const Input: React.FC<InputProps> = ({
   label,
   type,
   required,
   error,
+  options = [],
   ...rest
 }) => {
-  let labelContent;
-  if (required) {
-    labelContent = (
-      <Fragment>
-        {label}
-        <span className="text-danger fw-bold"> *</span>
-      </Fragment>
-    );
-  } else {
-    labelContent = label;
-  }
+  const labelContent = required ? (
+    <>
+      {label}
+      <span className="text-danger fw-bold"> *</span>
+    </>
+  ) : (
+    label
+  );
 
   return (
-    <Fragment>
+    <>
       <FloatingLabel
         controlId={`floating${label}`}
         label={labelContent}
         className="mb-2"
       >
-        <Form.Control type={type} placeholder={label} {...rest} />
+        {type === 'select' ? (
+          <Form.Select {...rest}>
+            <option value="">Select {label}</option>
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </Form.Select>
+        ) : (
+          <Form.Control type={type} placeholder={label} {...rest} />
+        )}
       </FloatingLabel>
 
-      {error && error.message && (
+      {error?.message && (
         <p className="text-danger">
           <Fragment>{error.message}</Fragment>
         </p>
       )}
-    </Fragment>
+    </>
   );
 };
 
