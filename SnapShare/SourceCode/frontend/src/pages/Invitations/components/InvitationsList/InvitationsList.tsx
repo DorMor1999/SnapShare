@@ -9,35 +9,11 @@ import SpinnerOverlay from '../../../../shared/components/UI/Spinner/SpinnerOver
 import Table from 'react-bootstrap/Table';
 import MyButton from '../../../../shared/components/UI/Button/MyButton';
 import classes from './InvitationsTable.module.css';
+import InvitationCard from '../InvitationCard/InvitationCard';
 
 interface InvitationsTableProps {
   userEmail: string | undefined;
 }
-
-type Invitation = {
-  id: number;
-  eventName: string;
-  invitationType: string;
-  sentAt: string;
-  status: 'pending' | 'accepted' | 'declined';
-};
-
-const sampleInvitations: Invitation[] = [
-  {
-    id: 1,
-    eventName: 'React Conference 2025',
-    invitationType: 'Online',
-    sentAt: '2025-05-15',
-    status: 'pending',
-  },
-  {
-    id: 2,
-    eventName: 'Tech Meetup',
-    invitationType: 'In-Person',
-    sentAt: '2025-05-10',
-    status: 'pending',
-  },
-];
 
 interface InvitationResponse {
   _id: string;
@@ -56,8 +32,21 @@ interface InvitationResponse {
 type InvitationsResponse = InvitationResponse[];
 
 const InvitationsList: React.FC<InvitationsTableProps> = ({ userEmail }) => {
-  const [invitations, setInvitations] =
-    useState<Invitation[]>(sampleInvitations);
+   const events = [
+    {
+      eventName: 'Conference 2025',
+      eventDate: '2025-06-12',
+      eventType: 'Business',
+      sentAt: '2025-05-16',
+    },
+    {
+      eventName: 'Hackathon',
+      eventDate: '2025-07-01',
+      eventType: 'Tech',
+      sentAt: '2025-05-15',
+    },
+  ];
+
   const { token } = useContext(UserContext);
 
   const { data, error, loading, sendRequest, clearError } =
@@ -81,7 +70,11 @@ const InvitationsList: React.FC<InvitationsTableProps> = ({ userEmail }) => {
       {error && <ErrorModal message={error} onClose={clearError} />}
       {loading && <SpinnerOverlay />}
       <br />
-
+    <div>
+      {events.map((event, index) => (
+        <InvitationCard key={index} {...event} />
+      ))}
+    </div>
       
     </Fragment>
   );

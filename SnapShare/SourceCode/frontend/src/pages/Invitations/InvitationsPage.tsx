@@ -5,7 +5,7 @@ import useHttpRequest from '../../hooks/useHttpRequest';
 import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
 import Wrapper from '../../shared/components/UI/Wrapper/Wrapper';
-import InvitationsList from './components/InvitationsTable/InvitationsList';
+import InvitationsList from './components/InvitationsList/InvitationsList';
 
 type UserProfile = {
   email: string;
