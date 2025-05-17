@@ -50,7 +50,7 @@ const LogInPage: React.FC = () => {
       `${API_URL}/authentication/login`,
       'POST',
       {
-        email: formData.email,
+        email: (formData.email).toLowerCase(),
         password: formData.password,
       }
     );

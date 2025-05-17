@@ -75,7 +75,7 @@ const RegisterPage: React.FC = () => {
     const form = new FormData();
     form.append('firstName', formData.firstName);
     form.append('lastName', formData.lastName);
-    form.append('email', formData.email);
+    form.append('email', (formData.email).toLowerCase());
     form.append('password', formData.password);
     form.append('phoneNumber', formData.phone);
 
