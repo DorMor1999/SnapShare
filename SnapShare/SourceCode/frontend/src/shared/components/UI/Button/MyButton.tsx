@@ -11,11 +11,12 @@ type MyButtonProps = {
   variant: string;
   size: "lg" | "sm" | undefined;
   link?: string;
+  onClick?: () => void;
 };
 
-const MyButton: React.FC<MyButtonProps> = ({ text, type, variant, size, link}) => {
+const MyButton: React.FC<MyButtonProps> = ({ text, type, variant, size, link, onClick}) => {
   return (
-    <Button href={link} variant={variant} type={type} size={size}>{text}</Button>
+    <Button href={link} variant={variant} type={type} size={size} onClick={onClick}>{text}</Button>
   );
 };
 
