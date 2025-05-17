@@ -6,9 +6,6 @@ import { InvitationType } from '../../../../shared/types/InvitationType';
 import { InvitationStatus } from '../../../../shared/types/InvitationStatus ';
 import ErrorModal from '../../../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../../../shared/components/UI/Spinner/SpinnerOverlay';
-import Table from 'react-bootstrap/Table';
-import MyButton from '../../../../shared/components/UI/Button/MyButton';
-import classes from './InvitationsTable.module.css';
 import InvitationCard from '../InvitationCard/InvitationCard';
 
 interface InvitationsTableProps {

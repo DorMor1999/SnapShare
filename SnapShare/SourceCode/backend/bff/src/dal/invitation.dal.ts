@@ -37,7 +37,7 @@ export const findInvitationsByEvent = async (eventId: string, filterBy?: string)
 export const findInvitationsByEmail = async (email: string, filterBy?: string): Promise<IInvitation[]> => {
   const query: any = { email };
   if (filterBy) query.status = filterBy;
-  return await Invitation.find(query);
+  return await Invitation.find(query).populate('eventId');
 };
 
 export const acceptInvitation = async (id: string, session: any): Promise<IInvitation | null> => {
