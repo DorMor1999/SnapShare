@@ -11,10 +11,9 @@ import classes from './NavLinkInvitations.module.css';
 import ErrorModal from '../../../UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../../UI/Spinner/SpinnerOverlay';
 
-
 interface InvitationResponse {
   _id: string;
-  eventId: string;
+  eventId: any;
   email: string;
   firstName: string;
   lastName: string;
@@ -42,16 +41,18 @@ const NavLinkInvitations: React.FC<NavLinkInvitationsProps> = ({
     useHttpRequest<InvitationsResponse>();
 
   useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL;
+    if (userEmail) {
+      const API_URL = import.meta.env.VITE_API_URL;
 
-    sendRequest(
-      `${API_URL}/invitations/email/${userEmail}?filterBy=PENDING`,
-      'GET',
-      undefined,
-      {
-        Authorization: `Bearer ${token}`,
-      }
-    );
+      sendRequest(
+        `${API_URL}/invitations/email/${userEmail}?filterBy=PENDING`,
+        'GET',
+        undefined,
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+    }
   }, [token, userEmail]);
 
   function moveToOtherPage(path: string): void {
@@ -62,7 +63,7 @@ const NavLinkInvitations: React.FC<NavLinkInvitationsProps> = ({
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
       {loading && <SpinnerOverlay />}
-      <Nav.Link onClick={() => moveToOtherPage("/invitations")}>
+      <Nav.Link onClick={() => moveToOtherPage('/invitations')}>
         Invitations{' '}
         {data && data?.length > 0 && (
           <Badge className={classes['invitations-badge']} pill bg="danger">
