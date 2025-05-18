@@ -31,3 +31,12 @@ export const getPhotosByEventId = async (eventId: string): Promise<IPhoto[]> => 
     throw new Error("Failed to retrieve photos by eventId");
   }
 };
+
+export const getPhotosByIds = async (photoIds: string[]): Promise<IPhoto[]> => {
+  try {
+    return await Photo.find({ _id: { $in: photoIds } });
+  } catch (error) {
+    console.error("Error retrieving photos by IDs:", error);
+    throw new Error("Failed to retrieve photos by IDs");
+  }
+};

@@ -132,7 +132,8 @@ def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
                     match = {
                         "photo_key": photo_data.get("photo_key"),
                         "position": position,
-                        "distance": distance
+                        "distance": distance,
+                        "photo_id": photo_data.get("photo_id"),
                     }
 
                     # Find if the user already exists in recognition_results

@@ -20,17 +20,17 @@ def get_Photos(event_photos_keys, event_id):
     # List and filter the blobs based on the provided keys and event path
     for blob in container_client.list_blobs():
         # Check if the blob path matches the desired event structure
-        if blob.name.startswith(f"events/{event_id}/") and blob.name.split("/")[-1] in event_photos_keys:
+        if blob.name.startswith(f"events/{event_id}/") and blob.name.split("/")[-1] in [key['photoUrl'] for key in event_photos_keys]:
             # Get the blob client for the current photo
             blob_client = container_client.get_blob_client(blob.name)
-
             # Download the blob's content as bytes
             photo_bytes = blob_client.download_blob().readall()
-
+           
             # Append the photo bytes and key to the photos list
             photos.append({
-                "photo_bytes": photo_bytes,
-                "photo_key": blob.name.split("/")[-1]  # Extract just the photo key (the last part)
+            "photo_bytes": photo_bytes,
+            "photo_key": blob.name.split("/")[-1],  # Extract just the photo key (the last part)
+            "photo_id": next((key['photoId'] for key in event_photos_keys if key['photoUrl'] == blob.name.split("/")[-1]), None)
             })
 
     return photos

@@ -1,4 +1,4 @@
-import { saveBulkPhotos } from "../dal/photo.dal";
+import { getPhotosByIds, saveBulkPhotos } from "../dal/photo.dal";
 import { IPhoto } from "../models/photo.model";
 import { getBlobContainerClient } from "./clients/photoStorage.client";
 import { v4 as uuidv4 } from "uuid";
@@ -38,6 +38,16 @@ export const uploadEventFiles = async (
 export const getPhotosByEventId = async (eventId: string): Promise<IPhoto[]> => {
   try {
     const photos = await getPhotosByEventId(eventId);
+    return photos;
+  } catch (error) {
+    console.error("Error retrieving photos by event ID:", error);
+    throw new Error("Failed to retrieve photos by event ID");
+  }
+};
+
+export const getPhotosByPhotoIds = async (photoIds: string[]): Promise<IPhoto[]> => {
+  try {
+    const photos = await getPhotosByIds(photoIds);
     return photos;
   } catch (error) {
     console.error("Error retrieving photos by event ID:", error);

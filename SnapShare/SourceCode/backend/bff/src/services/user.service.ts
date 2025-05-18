@@ -34,3 +34,7 @@ export const deleteUserById = async (id: string): Promise<IUser | null> => {
 export const getUserByEmail = async (email: string): Promise<IUser | null> => {
   return await UserDAL.fetchUserByEmail(email);
 };
+
+export const getUsersByUserIds = async (userIds: string[]): Promise<IUser[]> => {
+  return await UserDAL.getUsersByIds(userIds);
+};

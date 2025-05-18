@@ -124,3 +124,27 @@ export const uploadEventPhotos: RequestHandler = async (req, res) => {
     res.status(500).json({ message: "Failed to upload photos.", error });
   }
 };
+
+export const recognizeEventPhotos: RequestHandler = async (req, res) => {
+  const { eventId } = req.params;
+  let { photoIds } = req.body as { photoIds: string[] | undefined };
+
+  try {
+    if(!photoIds || photoIds.length === 0) {
+      photoIds = [];
+    }
+    const recognitionResults = await EventService.recognizeEventPhotos(eventId, photoIds);
+
+    if (!recognitionResults) {
+      res.status(404).json({ message: "Event or photos not found." });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Photo recognition completed successfully.",
+      results: recognitionResults,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to recognize photos.", error });
+  }
+};

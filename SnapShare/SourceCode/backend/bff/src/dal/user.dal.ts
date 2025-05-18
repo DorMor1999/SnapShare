@@ -39,3 +39,7 @@ export const deleteUserById = async (id: string): Promise<IUser | null> => {
 export const fetchUserByEmail = async (email: string): Promise<IUser | null> => {
   return await User.findOne({ email });
 };
+
+export const getUsersByIds = async (ids: string[]): Promise<IUser[]> => {
+  return await User.find({ _id: { $in: ids } });
+};
