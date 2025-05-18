@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 // Bootstrap imports
 import Row from 'react-bootstrap/Row';
@@ -32,6 +32,7 @@ type EventsResponse = Event[];
 
 const EventsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Get the query parameters, and set default values if they are not present
   const orderBy: string = searchParams.get('orderBy') || 'desc';
@@ -54,6 +55,10 @@ const EventsPage: React.FC = () => {
     );
   }, [token, userId]);
 
+  function moveToOtherPage(path: string): void {
+    navigate(`${path}`);
+  }
+
   let content;
   if (data && data.length > 0) {
     content = data?.map((event) => (
@@ -67,13 +72,21 @@ const EventsPage: React.FC = () => {
                   Manage
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item href={`/events/edit/${event._id}`}>
+                  <Dropdown.Item
+                    onClick={() => moveToOtherPage(`/events/edit/${event._id}`)}
+                  >
                     Edit
                   </Dropdown.Item>
                   <Dropdown.Item href="#">My Photos</Dropdown.Item>
                   <Dropdown.Item href="#">All Photos</Dropdown.Item>
-                  <Dropdown.Item href="#">
-                    Owners and Participants
+                  <Dropdown.Item
+                    onClick={() =>
+                      moveToOtherPage(
+                        `/events/${event._id}/owners_participants_invitations`
+                      )
+                    }
+                  >
+                    Owners Participants and Invitations
                   </Dropdown.Item>
                   <Dropdown.Item href="#">Delete</Dropdown.Item>
                 </Dropdown.Menu>

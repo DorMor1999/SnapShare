@@ -12,13 +12,13 @@ import EditEventPage from './pages/EditEvent/EditEventPage';
 import SendInvitationPage from './pages/SendInvitation/SendInvitationPage';
 import SendInvitationsPage from './pages/SendInvitations/SendInvitationsPage';
 import InvitationsPage from './pages/Invitations/InvitationsPage';
+import OwnersParticipantsInvitationsPage from './pages/OwnersParticipantsInvitations/OwnersParticipantsInvitationsPage';
 
 // context
 import { UserContext } from './context/UserContext';
 
 //my components
 import NavBar from './shared/components/NavBar/NavBar';
-
 
 
 
@@ -37,7 +37,7 @@ function App() {
         <Route path="/events/edit/:eventId" element={<EditEventPage />} />
         <Route path="/events/:eventId/send_invitations" element={<SendInvitationsPage />} />
         <Route path="/events/:eventId/send_invitation" element={<SendInvitationPage />} />
-        
+        <Route path="/events/:eventId/owners_participants_invitations" element={<OwnersParticipantsInvitationsPage />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );
