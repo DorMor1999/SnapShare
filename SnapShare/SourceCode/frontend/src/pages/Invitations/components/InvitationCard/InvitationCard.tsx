@@ -4,11 +4,12 @@ import useHttpRequest from '../../../../hooks/useHttpRequest';
 import ErrorModal from '../../../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../../../shared/components/UI/Spinner/SpinnerOverlay';
 import { UserContext } from '../../../../context/UserContext';
+import { InvitationType } from '../../../../shared/types/InvitationType';
 
 type InvitationCardProps = {
   eventName: string;
   eventDate: string;
-  invitationType: string;
+  invitationType: InvitationType;
   sentAt: string;
   invitationId: string;
 };

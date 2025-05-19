@@ -30,8 +30,8 @@ interface InvitationResponse {
   email: string;
   firstName: string;
   lastName: string;
-  type: 'OWNER' | 'PARTICIPANT';
-  status: 'ACCEPTED' | 'PENDING' | 'DECLINED';
+  type: InvitationType;
+  status: InvitationStatus;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   __v: number;
