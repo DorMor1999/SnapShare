@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useEffect, useState, ReactNode, useRef } from 'react';
 
 interface UserContextType {
   userId: string | null;
@@ -33,6 +33,26 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
+  const logoutTimeoutRef = useRef<number | null>(null);
+
+  const clearLogoutTimeout = () => {
+    if (logoutTimeoutRef.current) {
+      clearTimeout(logoutTimeoutRef.current);
+      logoutTimeoutRef.current = null;
+    }
+  };
+
+  const scheduleLogout = (token: string) => {
+    clearLogoutTimeout();
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000 - Date.now();
+      if (expirationTime > 0) {
+        logoutTimeoutRef.current = setTimeout(() => logout(), expirationTime);
+      }
+    } catch {}
+  };
+
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
     const storedToken = localStorage.getItem('token');
@@ -41,13 +61,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUserId(storedUserId);
       setToken(storedToken);
       setIsConnected(true);
-
-      const payload = JSON.parse(atob(storedToken.split('.')[1]));
-      const expirationTime = payload.exp * 1000 - Date.now();
-      setTimeout(() => logout(), expirationTime);
+      scheduleLogout(storedToken);
     } else {
       logout();
     }
+    // Cleanup on unmount
+    return clearLogoutTimeout;
   }, []);
 
   const setUser = (userId: string, token: string) => {
@@ -56,13 +75,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUserId(userId);
     setToken(token);
     setIsConnected(true);
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const expirationTime = payload.exp * 1000 - Date.now();
-    setTimeout(() => logout(), expirationTime);
+    scheduleLogout(token);
   };
 
   const logout = () => {
+    clearLogoutTimeout();
     localStorage.removeItem('userId');
     localStorage.removeItem('token');
     setUserId(null);
@@ -71,7 +88,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ userId, token, isConnected, setUser, logout }}>
+    <UserContext.Provider
+      value={{ userId, token, isConnected, setUser, logout }}
+    >
       {children}
     </UserContext.Provider>
   );

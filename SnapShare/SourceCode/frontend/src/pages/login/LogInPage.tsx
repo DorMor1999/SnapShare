@@ -57,7 +57,7 @@ const LogInPage: React.FC = () => {
 
     if (!error && data) {
       setUser(data.id, data.token);
-      navigate('/');
+      window.location.href = '/';
     }
   };
 
