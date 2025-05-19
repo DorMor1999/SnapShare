@@ -7,7 +7,7 @@ export const findAll = () => {
 };
 
 export const findById = (id: string) => {
-  return Event.findById(id);
+  return Event.findById(id).populate('owners').populate('participants');
 };
 
 export const create = (data: Partial<IEvent>) => {
@@ -21,10 +21,13 @@ export const update = (
   return Event.findByIdAndUpdate(id, updates, { new: true });
 };
 
-export const updateEventSetById = async (id: string, updateField: any, session: any) => {
+export const updateEventSetById = async (
+  id: string,
+  updateField: any,
+  session: any
+) => {
   await Event.findByIdAndUpdate(id, updateField, { session });
-}
-
+};
 
 export const remove = (id: string) => {
   return Event.findByIdAndDelete(id);

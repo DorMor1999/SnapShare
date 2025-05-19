@@ -1,0 +1,12 @@
+.scrollableTable {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.DECLINED {
+  color: #dc3545 !important;
+}
+
+.ACCEPTED {
+  color: #28a745 !important;
+}
