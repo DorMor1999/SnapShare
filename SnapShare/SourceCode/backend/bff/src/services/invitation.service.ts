@@ -29,8 +29,8 @@ export const createInvitation = async (data: Partial<IInvitation>): Promise<IInv
     if (user) {
         const userIdStr = user._id.toString();
         if (
-        event.participants.some((p) => p.toString() === userIdStr) ||
-        event.owners.some((o) => o.toString() === userIdStr)
+        event.participants.some((p) => p._id.toString() === userIdStr) ||
+        event.owners.some((o) => o._id.toString() === userIdStr)
         ) {
         throw new Error("This user is already a participant or owner.");
         }
@@ -77,8 +77,8 @@ export const createBatchInvitations = async (fileBuffer: Buffer, eventId: string
     if (user) {
       const userId = user._id.toString();
       if (
-        event.owners.some((o) => o.toString() === userId) ||
-        event.participants.some((p) => p.toString() === userId)
+        event.owners.some((o) => o._id.toString() === userId) ||
+        event.participants.some((p) => p._id.toString() === userId)
       ) {
         throw new Error(`User ${invitation.email} is already in event ${invitation.eventId}`);
       }
