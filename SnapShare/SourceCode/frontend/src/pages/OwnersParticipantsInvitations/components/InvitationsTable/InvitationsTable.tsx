@@ -84,7 +84,6 @@ const InvitationsTable: React.FC = () => {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false,
-                    timeZone: 'UTC', // ⬅️ This forces UTC
                   })}
                 </td>
               </tr>
