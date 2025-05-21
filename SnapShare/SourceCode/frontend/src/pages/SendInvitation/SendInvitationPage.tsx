@@ -58,7 +58,7 @@ const SendInvitationPage: React.FC = () => {
       }
     );
     if (!error) {
-      navigate('/');
+      navigate(`/events/${eventId}/owners_participants_invitations`);
     }
   };
 

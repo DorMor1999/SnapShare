@@ -8,6 +8,7 @@ import ErrorModal from '../../../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../../../shared/components/UI/Spinner/SpinnerOverlay';
 import styles from './InvitationsTable.module.css';
 import { InvitationStatus } from '../../../../shared/types/InvitationStatus ';
+import MyButton from '../../../../shared/components/UI/Button/MyButton';
 
 type InvitationResponse = {
   _id: string;
@@ -100,6 +101,23 @@ const InvitationsTable: React.FC = () => {
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
       {loading && <SpinnerOverlay />}
+      <MyButton
+        size={"lg"}
+        text="Send Invitation"
+        type="button"
+        link={`/events/${eventId}/send_invitation`}
+        variant="outline-primary"
+      />{' '}
+      {}
+      <MyButton
+        size={"lg"}
+        text="Send Invitations"
+        type="button"
+        link={`/events/${eventId}/send_invitations`}
+        variant="success"
+      />
+      <br />
+      <br/>
       {content}
     </Fragment>
   );
