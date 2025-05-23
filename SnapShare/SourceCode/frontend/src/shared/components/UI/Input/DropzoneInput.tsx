@@ -2,8 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import styles from './DropzoneInput.module.css'; // optional
 
+// Helper to generate a unique ID for each file
+const getFileId = (file: File) => `${file.name}_${file.size}_${file.lastModified}`;
+
 interface FileWithPreview extends File {
   preview: string;
+  id: string;
 }
 
 type DropzoneInputProps = {
@@ -16,7 +20,7 @@ type DropzoneInputProps = {
 const DropzoneInput: React.FC<DropzoneInputProps> = ({
   onDrop,
   error,
-  maxFiles = 5, // Set max files to 5
+  maxFiles = 5,
   multiple = true,
 }) => {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
@@ -26,21 +30,46 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
       const filesWithPreview: FileWithPreview[] = acceptedFiles.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
+          id: getFileId(file),
         })
       );
 
-      const newFiles = [...files, ...filesWithPreview].slice(0, maxFiles); // Limit to maxFiles
-      setFiles(newFiles);
-      onDrop(newFiles);
+      setFiles((prevFiles) => {
+        const allFiles = [...prevFiles, ...filesWithPreview];
+        const uniqueFiles = allFiles.filter(
+          (file, idx, arr) => arr.findIndex((f) => f.id === file.id) === idx
+        );
+        const newFiles = uniqueFiles.slice(0, maxFiles);
+        
+        // Call onDrop asynchronously after state update
+        setTimeout(() => onDrop(newFiles), 0);
+        
+        return newFiles;
+      });
     },
-    [files, maxFiles, onDrop]
+    [maxFiles, onDrop]
   );
 
-  const removeFile = (fileToRemove: FileWithPreview) => {
-    const newFiles = files.filter((file) => file !== fileToRemove);
-    setFiles(newFiles);
-    onDrop(newFiles);
-  };
+  const removeFile = useCallback((fileId: string) => {
+    setFiles((prevFiles) => {
+      const fileToRemove = prevFiles.find((f) => f.id === fileId);
+      if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview);
+
+      const newFiles = prevFiles.filter((file) => file.id !== fileId);
+      
+      // Call onDrop asynchronously after state update
+      setTimeout(() => onDrop(newFiles), 0);
+      
+      return newFiles;
+    });
+  }, [onDrop]);
+
+  // Clean up previews when component unmounts
+  useEffect(() => {
+    return () => {
+      files.forEach((file) => URL.revokeObjectURL(file.preview));
+    };
+  }, [files]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: handleDrop,
@@ -50,12 +79,6 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
     multiple,
     maxFiles,
   });
-
-  useEffect(() => {
-    return () => {
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
-    };
-  }, [files]);
 
   return (
     <div className={styles.dropzoneContainer}>
@@ -70,17 +93,17 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
 
       {files.length > 0 && (
         <div className={styles.previewContainer}>
-          {files.slice(0, 5).map((file, idx) => (
-            <div key={idx} className={styles.previewThumb}>
+          {files.map((file) => (
+            <div key={file.id} className={styles.previewThumb}>
               <img
                 src={file.preview}
-                alt={`preview ${idx}`}
+                alt={`preview ${file.name}`}
                 className={styles.previewImage}
               />
               <div className={styles.fileName}>{file.name}</div>
               <button
                 className={styles.removeButton}
-                onClick={() => removeFile(file)}
+                onClick={() => removeFile(file.id)}
               >
                 X
               </button>

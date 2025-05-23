@@ -73,7 +73,7 @@ const EventsPage: React.FC = () => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item
-                    onClick={() => moveToOtherPage(`/events/edit/${event._id}`)}
+                    onClick={() => moveToOtherPage(`/events/${event._id}/edit`)}
                   >
                     Edit
                   </Dropdown.Item>

@@ -77,7 +77,7 @@ const RegisterPage: React.FC = () => {
     form.append('lastName', formData.lastName);
     form.append('email', (formData.email).toLowerCase());
     form.append('password', formData.password);
-    form.append('phoneNumber', formData.phone);
+    formData.phone && form.append('phoneNumber', formData.phone);
 
     formData.profilePictures.forEach((file, index) => {
       form.append('files', file);

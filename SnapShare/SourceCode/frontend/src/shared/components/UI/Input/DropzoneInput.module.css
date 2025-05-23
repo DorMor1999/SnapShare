@@ -18,6 +18,9 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
+  max-height: 150px; /* Set the visible height */
+  overflow-y: auto;  /* Enable vertical scroll */
+  justify-content: center;
 }
 
 .previewThumb {

@@ -19,6 +19,7 @@ import { UserContext } from './context/UserContext';
 
 //my components
 import NavBar from './shared/components/NavBar/NavBar';
+import UploadPhotosPage from './pages/UploadPhotos/UploadPhotosPage';
 
 
 
@@ -34,10 +35,11 @@ function App() {
         <Route path="/invitations" element={<InvitationsPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/new" element={<NewEventPage />} />
-        <Route path="/events/edit/:eventId" element={<EditEventPage />} />
+        <Route path="/events/:eventId/edit" element={<EditEventPage />} />
         <Route path="/events/:eventId/send_invitations" element={<SendInvitationsPage />} />
         <Route path="/events/:eventId/send_invitation" element={<SendInvitationPage />} />
         <Route path="/events/:eventId/owners_participants_invitations" element={<OwnersParticipantsInvitationsPage />} />
+        <Route path="/events/:eventId/upload_photos" element={<UploadPhotosPage />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );
