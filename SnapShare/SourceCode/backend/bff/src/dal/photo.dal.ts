@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Photo, IPhoto } from "../models/photo.model";
 
 export const savePhoto = async (eventId: string, url: string): Promise<IPhoto> => {
@@ -11,11 +12,9 @@ export const savePhoto = async (eventId: string, url: string): Promise<IPhoto> =
 };
 
 export const saveBulkPhotos = async (
-  eventId: string,
-  urls: string[]
-): Promise<IPhoto[]> => {
+  photos: Partial<IPhoto>[]
+): Promise<Partial<IPhoto>[]> => {
   try {
-    const photos = urls.map((url) => ({ eventId, url }));
     return await Photo.insertMany(photos);
   } catch (error) {
     console.error("Error saving bulk photos to the database:", error);
@@ -39,4 +38,15 @@ export const getPhotosByIds = async (photoIds: string[]): Promise<IPhoto[]> => {
     console.error("Error retrieving photos by IDs:", error);
     throw new Error("Failed to retrieve photos by IDs");
   }
+};
+
+export const updatePhotoUserIds = async (
+  photoId: string,
+  userIds: Types.ObjectId[]
+): Promise<IPhoto | null> => {
+  return await Photo.findByIdAndUpdate(
+    photoId,
+    { $addToSet: { userIds: { $each: userIds } } }, // Add userIds to the list
+    { new: true }
+  ).exec();
 };

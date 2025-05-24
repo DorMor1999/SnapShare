@@ -6,11 +6,11 @@ export const createPhotoUser = async (data: Partial<IPhotoUser>): Promise<IPhoto
 };
 
 export const getPhotoUserById = async (id: string): Promise<IPhotoUser | null> => {
-  return await PhotoUser.findById(id).populate("userId").populate("photoIds").exec();
+  return await PhotoUser.findById(id).populate("userId").populate("photoTags").exec();
 };
 
 export const getPhotoUserByUserId = async (userId: string): Promise<IPhotoUser | null> => {
-  return await PhotoUser.findOne({ userId }).populate("photoIds").exec();
+  return await PhotoUser.findOne({ userId }).populate("photoTags").exec();
 };
 
 export const updatePhotoUser = async (

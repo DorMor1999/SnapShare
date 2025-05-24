@@ -7,7 +7,8 @@ import {
   updateEventById,
   deleteEventById,
   getUserEvents,
-  recognizeEventPhotos
+  recognizeEventPhotos,
+  getEventPhotosController
 } from '../controllers/event.controller';
 import {
   createEventSchema,
@@ -31,5 +32,6 @@ router.delete('/:id', deleteEventById);
 router.get('/user/:userId', getUserEvents);
 router.post("/:eventId/photos", parseFormData, uploadEventPhotos);
 router.post("/:eventId/recognize", recognizeEventPhotos);
+router.get("/:eventId/photos", getEventPhotosController);
 
 export default router;

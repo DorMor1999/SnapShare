@@ -83,7 +83,7 @@ def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
     Results are returned in a separate 'recognition_results' array containing user_id and matched photos.
 
     Args:
-        profiles (list): List of profiles to compare, each containing 'profile_encoding' and 'user_id'.
+        profiles (list): List of profiles to compare, each containing 'encoding' and 'user_id'.
         other_photos_data (list): List of photo data (dicts) to compare against,
                                   each containing 'photo_bytes' and 'photo_key'.
         tolerance (float): Threshold for the match distance.
@@ -92,6 +92,7 @@ def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
     Returns:
         list: A list of dictionaries with 'user_id' and their 'inside_photos' matches.
     """
+
     recognition_results = []  # This will store the results with 'user_id' and 'inside_photos' for each user
     cache = {}
 
@@ -99,12 +100,14 @@ def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
         # Extract the photo bytes from the dictionary
         photo_bytes = photo_data.get('photo_bytes')
         if not photo_bytes:
+            print("No photo bytes found in the data.")
             continue  # Skip if no photo bytes are available
 
         # Step 1: Detect and encode faces in the current photo (once)
         other_encodings, face_locations, face_sizes = load_and_encode_photo(photo_bytes, cache)
 
         if not other_encodings:
+            print("No faces detected in the photo.")
             continue
 
         # Step 2: Compute face size threshold for position classification
@@ -117,7 +120,7 @@ def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
             face_size = face_sizes[encoding_index]
 
             for profile in profiles:
-                profile_encoding = profile.get("profile_encoding")
+                profile_encoding = profile.get("encoding")
                 if profile_encoding is None:
                     continue
 
@@ -137,18 +140,18 @@ def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
                     }
 
                     # Find if the user already exists in recognition_results
-                    user_id = profile.get("user_id")
-                    result = next((item for item in recognition_results if item["user_id"] == user_id), None)
+                    user_id = profile.get("userId")
+                    result = next((item for item in recognition_results if item["userId"] == user_id), None)
 
                     if result is None:
                         # If the user doesn't exist in the results, create a new entry
                         recognition_results.append({
-                            "user_id": user_id,
-                            "inside_photos": [match]
+                            "userId": user_id,
+                            "photos": [match]
                         })
                     else:
                         # Otherwise, append the match to the existing user's "inside_photos"
-                        result["inside_photos"].append(match)
+                        result["photos"].append(match)
 
         cache.clear()
 

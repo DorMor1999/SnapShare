@@ -1,14 +1,14 @@
 import * as eventDal from "../dal/event.dal";
 import { IEvent } from "../models/event.model";
 import mongoose, { SortOrder } from "mongoose";
-import { getPhotosByPhotoIds, uploadEventFiles } from "./photo.service";
+import { addUserIdsToPhoto, getPhotosByPhotoIds, uploadEventFiles } from "./photo.service";
 import { recognizeFaces } from "../services/faceRecognition.service";
 import { IPhoto } from "../models/photo.model";
 import { getUsersByUserIds } from "./user.service";
 import { IUser } from "../models/user.model";
 import { FaceRecognitionRecognizeResponse } from "../models/api-responses/faceRecognitionRecognize.response";
 import { createPhotoUser, getPhotoUserByUserId, updatePhotoUserById } from "./photoUser.service";
-import { IPhotoUser } from "../models/photoUser.model";
+import { IPhotoUser, PhotoTag } from "../models/photoUser.model";
 
 export const getAllEvents = async (): Promise<IEvent[]> => {
   return await eventDal.findAll();
@@ -46,7 +46,7 @@ export const uploadEventPhotos = async (eventId: string, photos: Express.Multer.
   }
 
   event.updatedAt = new Date(); 
-  uploadEventFiles(photos, eventId);
+  let savedPhotos = await uploadEventFiles(photos, eventId);
 
   return await eventDal.update(eventId, { photoGroups: event.photoGroups });
 };
@@ -62,26 +62,61 @@ export const recognizeEventPhotos = async (
   }
   
   let photos: IPhoto[] = await getPhotosByPhotoIds(photoIds);
-  const userIds: string[] = Array.from(new Set([...event.participants.map(String), ...event.owners.map(String)]));
+  const userIds: string[] = Array.from(
+    new Set([
+      ...event.participants.map((participant) => participant._id.toString()),
+      ...event.owners.map((owner) => owner._id.toString()),
+    ])
+  );  
   let users: IUser[] = await getUsersByUserIds(userIds);
-  let recognitions: FaceRecognitionRecognizeResponse[] = await recognizeFaces(eventId, photos, users);
-  let photoUsersModel: IPhotoUser | null = null;
-  
-  recognitions.forEach(async (recognition) => {
-    const user = users.find(user => user._id.toString() === recognition.userId);
-    photoUsersModel = await getPhotoUserByUserId(recognition.userId);
-    if(!photoUsersModel) {
+  let recognition_res: FaceRecognitionRecognizeResponse = await recognizeFaces(eventId, photos, users);
+  let photoUsersModel: IPhotoUser[] = [];
+  let recognitions = recognition_res.recognition_results;
+
+  for (const recognition of recognitions) {
+    //let user = users.find(user => user._id.toString() === recognition.userId);
+    let photoUserModel = await getPhotoUserByUserId(recognition.userId);
+    if(!photoUserModel) {
+      let photoTags: PhotoTag[] = recognition.photos.map(photo => {
+        return {
+          photoId: new mongoose.Types.ObjectId(photo.photo_id),
+          position: photo.position,
+        };
+      }); 
       let photoUser: Partial<IPhotoUser> = {
-        userId: new mongoose.Types.ObjectId(recognition.userId), 
-        photoIds: recognition.photos.map(photo => new mongoose.Types.ObjectId(photo.photoId)) 
+        userId: new mongoose.Types.ObjectId(recognition.userId),
+        photoTags
       };
-      photoUsersModel = await createPhotoUser(photoUser);
+      photoUserModel = await createPhotoUser(photoUser);
     } else {
-      const newPhotoIds = recognition.photos.map(photo => new mongoose.Types.ObjectId(photo.photoId));
-      photoUsersModel.photoIds = Array.from(new Set([...photoUsersModel.photoIds, ...recognition.photos.map(photo => new mongoose.Types.ObjectId(photo.photoId))]));
-      photoUsersModel = await updatePhotoUserById(photoUsersModel.userId.toString(), photoUsersModel);
+      let newPhotoIds: string[] = [];
+      let newPhotoTags: PhotoTag[] = recognition.photos.map(photo => {
+        let id = new mongoose.Types.ObjectId(photo.photo_id)
+        newPhotoIds.push(id.toString());
+        return {
+          photoId: id,
+          position: photo.position,
+        };
+      });
+
+      photoUserModel.photoTags.forEach((tag) => {
+        if(!newPhotoIds.includes(tag.photoId.toString())){
+          newPhotoTags.push(tag);
+        }
+      });
+
+      photoUserModel.photoTags = newPhotoTags;
+      
+      photoUserModel = await updatePhotoUserById(photoUserModel.userId.toString(), photoUserModel);
     }
-  });
+
+    if(photoUserModel){
+      photoUsersModel.push(photoUserModel);
+      for (const p of recognition.photos) {
+        await addUserIdsToPhoto(p.photo_id, [recognition.userId]);
+      }
+    }
+  };
   
   return photoUsersModel;
 };

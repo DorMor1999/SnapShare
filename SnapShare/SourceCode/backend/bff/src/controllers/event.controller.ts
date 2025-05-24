@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from 'express';
 import { getUserById } from '../services/user.service';
 import * as EventService from '../services/event.service';
+import { getPhotosByEventId } from '../services/photo.service';
 
 export const getAllEvents: RequestHandler = async (req, res) => {
   try {
@@ -131,7 +132,8 @@ export const recognizeEventPhotos: RequestHandler = async (req, res) => {
 
   try {
     if(!photoIds || photoIds.length === 0) {
-      photoIds = [];
+      let photos = await getPhotosByEventId(eventId);
+      photoIds = photos.map(photo => photo._id!.toString());
     }
     const recognitionResults = await EventService.recognizeEventPhotos(eventId, photoIds);
 
@@ -146,5 +148,22 @@ export const recognizeEventPhotos: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to recognize photos.", error });
+  }
+};
+
+export const getEventPhotosController: RequestHandler = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const photos = await getPhotosByEventId(eventId);
+
+    if (!photos || photos.length === 0) {
+      res.status(404).json({ message: "No photos found for this event." });
+      return;
+    }
+
+    res.status(200).json(photos);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch event photos.", error });
   }
 };

@@ -9,7 +9,7 @@ recognition_bp = Blueprint('recognition_bp', __name__, url_prefix='/events')
 def trigger_recognition(event_id):
     """
     Triggers the face recognition process on uploaded profiles and bulk photos.
-    Accepts 'event_photos_keys', 'users_encodes' (array of dictionaries containing 'user_id' and 'profile_encoding'),
+    Accepts 'event_photos_keys', 'users_encodes' (array of dictionaries containing 'userId' and 'encoding'),
     and 'event_id' in the JSON body.
     """
     data = request.get_json() or {}
@@ -19,15 +19,14 @@ def trigger_recognition(event_id):
         return jsonify({"error": "'event_id' is required"}), 400
 
     event_photos_keys = data.get('event_photos_keys')  # Array of photo keys
-    users_encodes = data.get('users_encodes')  # Array of dictionaries containing 'user_id' and 'encode'
-
+    users_encodes = data.get('users_encodes')  # Array of dictionaries containing 'userId' and 'encode'
     # Validate if 'event_photos_keys' is a list
     if not isinstance(event_photos_keys, list):
         return jsonify({"error": "'event_photos_keys' must be an array"}), 400
 
-    # Validate if user_encodes is a list of dictionaries with 'user_id' and 'profile_encoding' keys
-    if not isinstance(users_encodes, list) or not all(isinstance(item, dict) and 'user_id' in item and 'profile_encoding' in item for item in users_encodes):
-        return jsonify({"error": "'users_encodes' must be an array of dictionaries containing 'user_id' and 'profile_encoding'"}), 400
+    # Validate if user_encodes is a list of dictionaries with 'userId' and 'encoding' keys
+    if not isinstance(users_encodes, list) or not all(isinstance(item, dict) and 'userId' in item and 'encoding' in item for item in users_encodes):
+        return jsonify({"error": "'users_encodes' must be an array of dictionaries containing 'userId' and 'encoding'"}), 400
 
     try:
         # Getting event photos - List of dicts to compare against, each containing 'photo_bytes' and 'photo_key'.

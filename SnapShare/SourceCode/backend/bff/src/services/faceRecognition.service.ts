@@ -37,7 +37,7 @@ export const recognizeFaces = async (
   eventId: string,
   photos: IPhoto[],
   users: IUser[]
-): Promise<FaceRecognitionRecognizeResponse[]> => {
+): Promise<FaceRecognitionRecognizeResponse> => {
   const req: FaceRecognitionRecognizeRequest = {
     'event_photos_keys': photos.map((photo) => ({ photoId: photo.id, photoUrl: photo.url })),
     'users_encodes': users.map((user) => ({ userId: user._id.toString(), encoding: user.profilePhotosEncoding })),
