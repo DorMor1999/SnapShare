@@ -71,3 +71,16 @@ export const addUserIdsToPhoto = async (
   const objectIdUserIds = userIds.map((id) => new mongoose.Types.ObjectId(id));
   return await photoDal.updatePhotoUserIds(photoId, objectIdUserIds);
 };
+
+export const getUserPhotosByEventId = async (
+  eventId: string,  
+  userId: string
+): Promise<IPhoto[]> => { 
+  try {
+    const photos = await photoDal.getPhotosByEventId(eventId);
+    return photos.filter(photo => photo.userIds?.includes(new mongoose.Types.ObjectId(userId)));
+  } catch (error) {
+    console.error("Error retrieving user photos by event ID:", error);
+    throw new Error("Failed to retrieve user photos by event ID");
+  }
+}

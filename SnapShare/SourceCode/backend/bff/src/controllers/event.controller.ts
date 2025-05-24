@@ -1,7 +1,7 @@
 import { Request, Response, RequestHandler } from 'express';
 import { getUserById } from '../services/user.service';
 import * as EventService from '../services/event.service';
-import { getPhotosByEventId } from '../services/photo.service';
+import { getPhotosByEventId, getUserPhotosByEventId } from '../services/photo.service';
 
 export const getAllEvents: RequestHandler = async (req, res) => {
   try {
@@ -151,12 +151,29 @@ export const recognizeEventPhotos: RequestHandler = async (req, res) => {
   }
 };
 
-export const getEventPhotosController: RequestHandler = async (req, res) => {
+export const getEventPhotos: RequestHandler = async (req, res) => {
   const { eventId } = req.params;
 
   try {
     const photos = await getPhotosByEventId(eventId);
 
+    if (!photos || photos.length === 0) {
+      res.status(404).json({ message: "No photos found for this event." });
+      return;
+    }
+
+    res.status(200).json(photos);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch event photos.", error });
+  }
+};
+
+export const getEventUserPhotos: RequestHandler = async (req, res) => {
+  const { eventId, userId } = req.params;
+
+  try {
+    const photos = await getUserPhotosByEventId(eventId, userId);
+    
     if (!photos || photos.length === 0) {
       res.status(404).json({ message: "No photos found for this event." });
       return;
