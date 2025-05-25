@@ -26,5 +26,9 @@ export const createPhotoUser = async (photoUserData: Partial<IPhotoUser>): Promi
  * @returns The updated PhotoUser entry
  */
 export const updatePhotoUserById = async (userId: string, updateData: Partial<IPhotoUser>): Promise<IPhotoUser | null> => {
-    return await photoUserDal.updatePhotoUser(userId, updateData);
+  let existingPhotoUser: IPhotoUser|null = await photoUserDal.getPhotoUserByUserId(userId);
+  if (!existingPhotoUser) {
+    throw new Error(`PhotoUser with userId ${userId} not found`);
+  }
+  return await photoUserDal.updatePhotoUser(existingPhotoUser._id!.toString(), updateData);
 };

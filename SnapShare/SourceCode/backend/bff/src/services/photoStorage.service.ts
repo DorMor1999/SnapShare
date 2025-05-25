@@ -28,29 +28,6 @@ export const uploadFileToBlobStorage = async (
   }
 };
 
-
-// New method to upload multiple files
-export const uploadMultipleFilesToBlobStorage = async (
-    userId: mongoose.Types.ObjectId,
-    files: Express.Multer.File[],
-    containerName: string,
-  ): Promise<string[]> => {
-    try {
-      // Upload each file and collect their URLs
-      const uploadedUrls = await Promise.all(
-        files.map(async (file, index) => {
-          file.originalname = `${userId}-${index}`; 
-          return await uploadFileToBlobStorage(file, containerName)
-        })
-      );
-  
-      return uploadedUrls;
-    } catch (error) {
-      console.error("Error uploading multiple files to Azure Blob Storage:", error);
-      throw new Error("Failed to upload multiple files to Azure Blob Storage");
-    }
-  };
-
   // add method that uploads profile photos to blob and using uploadMultipleFilesToBlobStorage
 export const uploadProfilePhotosToBlobStorage = async (
     userId: mongoose.Types.ObjectId,
