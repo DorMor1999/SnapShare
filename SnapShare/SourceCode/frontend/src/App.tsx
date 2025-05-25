@@ -20,6 +20,8 @@ import { UserContext } from './context/UserContext';
 //my components
 import NavBar from './shared/components/NavBar/NavBar';
 import UploadPhotosPage from './pages/UploadPhotos/UploadPhotosPage';
+import AllPhotosPage from './pages/AllPhotos/AllPhotosPage';
+import MyPhotosPage from './pages/MyPhotos/MyPhotosPage';
 
 
 
@@ -40,6 +42,8 @@ function App() {
         <Route path="/events/:eventId/send_invitation" element={<SendInvitationPage />} />
         <Route path="/events/:eventId/owners_participants_invitations" element={<OwnersParticipantsInvitationsPage />} />
         <Route path="/events/:eventId/upload_photos" element={<UploadPhotosPage />} />
+        <Route path="/events/:eventId/all_photos" element={<AllPhotosPage />} />
+        <Route path="/events/:eventId/my_photos" element={<MyPhotosPage />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );

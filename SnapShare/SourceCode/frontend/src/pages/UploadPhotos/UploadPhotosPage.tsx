@@ -84,7 +84,7 @@ const UploadPhotosPage: React.FC = () => {
     );
 
     if (!error) {
-      navigate('/');
+      navigate(`/events/${eventId}/all_photos`);
     }
   };
 

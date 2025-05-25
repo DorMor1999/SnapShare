@@ -77,8 +77,8 @@ const EventsPage: React.FC = () => {
                   >
                     Edit
                   </Dropdown.Item>
-                  <Dropdown.Item href="#">My Photos</Dropdown.Item>
-                  <Dropdown.Item href="#">All Photos</Dropdown.Item>
+                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/my_photos`)}>My Photos</Dropdown.Item>
+                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/all_photos`)}>All Photos</Dropdown.Item>
                   <Dropdown.Item
                     onClick={() =>
                       moveToOtherPage(
@@ -93,10 +93,11 @@ const EventsPage: React.FC = () => {
               </Dropdown>
             ) : (
               <MyButton
-                text="View"
+                text="My Photos"
                 type="button"
                 variant="primary"
                 size={undefined}
+                onClick={() => moveToOtherPage(`/events/${event._id}/my_photos`)}
               />
             )}
           </div>
