@@ -1,7 +1,7 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import { Table } from 'react-bootstrap';
 import styles from './TagTable.module.css';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { UserContext } from '../../../context/UserContext';
 import useHttpRequest from '../../../hooks/useHttpRequest';
 import ErrorModal from '../../../shared/components/UI/Modal/ErrorModal';
@@ -25,6 +25,7 @@ interface ResponseType {
 }
 
 const TagTable: React.FC<TagTableProps> = ({ users }) => {
+  const navigate = useNavigate();
   const params = useParams();
   const eventId = params.eventId ?? '';
   const photoId = params.photoId ?? '';
@@ -52,6 +53,20 @@ const TagTable: React.FC<TagTableProps> = ({ users }) => {
       tagContent = (
         <Fragment>
           <h2>Tags</h2>
+          <br />
+          {isOwner && (
+            <MyButton
+              type="button"
+              variant="primary"
+              text="Add Tag"
+              size="lg"
+              onClick={() =>
+                navigate(`/events/${eventId}/photos/${photoId}/add_tag`)
+              }
+            />
+          )}
+          <br />
+          <br />
           <div className={styles.scrollableTable}>
             <Table striped hover size={'sm'}>
               <thead>
@@ -98,9 +113,7 @@ const TagTable: React.FC<TagTableProps> = ({ users }) => {
                           size="sm"
                           variant="danger"
                           type="button"
-                          onClick={() =>
-                            deleteTag(photoId, user._id)
-                          }
+                          onClick={() => deleteTag(photoId, user._id)}
                         />
                       </td>
                     )}
@@ -118,7 +131,7 @@ const TagTable: React.FC<TagTableProps> = ({ users }) => {
     tagContent = <h2>We have problem please try again later!!</h2>;
   }
 
-  console.log(isOwner);
+  
   return (
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}

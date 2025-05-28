@@ -23,6 +23,7 @@ import UploadPhotosPage from './pages/UploadPhotos/UploadPhotosPage';
 import AllPhotosPage from './pages/AllPhotos/AllPhotosPage';
 import MyPhotosPage from './pages/MyPhotos/MyPhotosPage';
 import PhotoPage from './pages/Photo/PhotoPage';
+import AddTagPage from './pages/AddTag/AddTagPage';
 
 
 
@@ -46,6 +47,7 @@ function App() {
         <Route path="/events/:eventId/all_photos" element={<AllPhotosPage />} />
         <Route path="/events/:eventId/my_photos" element={<MyPhotosPage />} />
         <Route path="/events/:eventId/photos/:photoId" element={<PhotoPage />} />
+        <Route path="/events/:eventId/photos/:photoId/add_tag" element={<AddTagPage />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );

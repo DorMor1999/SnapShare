@@ -11,3 +11,5 @@ export type Photo = {
 };
 
 export type PhotoArray = Photo[];
+
+export type PhotoPositionType = "Close (Main Subject)" | "Background";
