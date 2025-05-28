@@ -1,19 +1,75 @@
-import React, { useContext } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import Wrapper from '../../shared/components/UI/Wrapper/Wrapper';
 import { useParams } from 'react-router';
 import { UserContext } from '../../context/UserContext';
+import useHttpRequest from '../../hooks/useHttpRequest';
+import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
+import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
+import { Image } from 'react-bootstrap';
+import TagTable from './components/TagTable';
+
+interface PopulatedUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePhotosUrls: string[][];
+}
+
+interface PopulatedPhotoResponse {
+  _id: string;
+  eventId: string;
+  url: string;
+  photoGroups: any[]; // You can replace 'any' with a proper type if needed
+  userIds: PopulatedUser[];
+  uploadedAt: string; // or `Date` if you parse it
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
 
 const PhotoPage: React.FC = () => {
   const params = useParams();
   const eventId = params.eventId ?? '';
   const photoId = params.photoId ?? '';
+  const { token } = useContext(UserContext);
 
-  
+  const { data, error, loading, sendRequest, clearError } =
+    useHttpRequest<PopulatedPhotoResponse>();
+
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL;
+    sendRequest(
+      `${API_URL}/events/${eventId}/photos/${photoId}`,
+      'GET',
+      undefined,
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    );
+  }, [token, eventId]);
+
+  let content;
+  if (data) {
+    content = (<Fragment>
+        <br/>
+        <Image src={data.url} alt={`Photo ${photoId}`} fluid rounded className="mb-3" />
+        <br/>
+        <TagTable users={data.userIds}/>
+    </Fragment>);
+  } else {
+    content = <h2>Photo not found!</h2>;
+  }
 
   return (
-    <Wrapper>
-      <h1>Photo</h1>
-    </Wrapper>
+    <Fragment>
+      {error && <ErrorModal message={error} onClose={clearError} />}
+      {loading && <SpinnerOverlay />}
+      <Wrapper>
+        <h1>Photo</h1>
+        {content}
+      </Wrapper>
+    </Fragment>
   );
 };
 
