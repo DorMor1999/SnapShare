@@ -22,6 +22,7 @@ import NavBar from './shared/components/NavBar/NavBar';
 import UploadPhotosPage from './pages/UploadPhotos/UploadPhotosPage';
 import AllPhotosPage from './pages/AllPhotos/AllPhotosPage';
 import MyPhotosPage from './pages/MyPhotos/MyPhotosPage';
+import PhotoPage from './pages/Photo/PhotoPage';
 
 
 
@@ -44,6 +45,7 @@ function App() {
         <Route path="/events/:eventId/upload_photos" element={<UploadPhotosPage />} />
         <Route path="/events/:eventId/all_photos" element={<AllPhotosPage />} />
         <Route path="/events/:eventId/my_photos" element={<MyPhotosPage />} />
+        <Route path="/events/:eventId/photos/:photoId" element={<PhotoPage />} />
         <Route path="*" element={<HomePage />} />
       </Fragment>
     );

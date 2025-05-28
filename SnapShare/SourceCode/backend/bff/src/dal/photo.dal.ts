@@ -50,3 +50,12 @@ export const updatePhotoUserIds = async (
     { new: true }
   ).exec();
 };
+
+export const getPhotoByIdWithUsers = async (photoId: string) => {
+  return await Photo.findById(photoId)
+    .populate({
+      path: "userIds",
+      select: "_id firstName lastName email profilePhotosUrls"
+    })
+    .exec();
+};

@@ -2,6 +2,7 @@ import mongoose  from "mongoose";
 import * as photoDal from "../dal/photo.dal";
 import { IPhoto } from "../models/photo.model";
 import { getBlobContainerClient } from "./clients/photoStorage.client";
+import { Types } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 export const uploadEventFiles = async (
@@ -84,3 +85,16 @@ export const getUserPhotosByEventId = async (
     throw new Error("Failed to retrieve user photos by event ID");
   }
 }
+
+export const getPhotoWithUsers = async (photoId: string) => {
+  if (!Types.ObjectId.isValid(photoId)) {
+    throw new Error("Invalid photo ID");
+  }
+
+  const photo = await photoDal.getPhotoByIdWithUsers(photoId);
+  if (!photo) {
+    throw new Error("Photo not found");
+  }
+
+  return photo;
+};

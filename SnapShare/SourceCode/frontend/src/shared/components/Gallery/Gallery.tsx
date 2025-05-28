@@ -1,41 +1,32 @@
 // Gallery.tsx
 import React, { Fragment, useState } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import {  Row, Col, Card } from 'react-bootstrap';
 import { PhotoArray } from '../../types/Photos';
 import styles from './Gallery.module.css';
-import PhotoModal from '../UI/Modal/PhotoModal';
+import { useNavigate, useParams } from 'react-router';
+
 
 type GalleryProps = {
   photos: PhotoArray;
-  isOwner: boolean;
 };
 
-const Gallery: React.FC<GalleryProps> = ({ photos, isOwner }) => {
-  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
-  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string>('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
+const Gallery: React.FC<GalleryProps> = ({ photos }) => {
+  const navigate = useNavigate();
+  const { eventId } = useParams();
+  
 
-  const openModal = (photoId: string, photoUrl: string) => {
-    setSelectedPhotoId(photoId);
-    setSelectedPhotoUrl(photoUrl);
-    setIsModalVisible(true);
-  };
+  function moveToOtherPage(path: string): void {
+    navigate(`${path}`);
+  }
 
   return (
     <Fragment>
-      <PhotoModal
-        show={isModalVisible}
-        onHide={() => setIsModalVisible(false)}
-        photoId={selectedPhotoId ?? ''}
-        isOwner={isOwner}
-        photoUrl={selectedPhotoUrl}
-      />
       <Row className="g-4">
         {photos.map((photo) => (
           <Col key={photo._id} lg={4} md={6} sm={12}>
             <Card
               className={`h-100 ${styles.cardClickable}`}
-              onClick={() => openModal(photo._id, photo.url)}
+              onClick={() => moveToOtherPage(`/events/${eventId}/photos/${photo._id}`)}
             >
               <Card.Img
                 variant="top"

@@ -33,7 +33,7 @@ const AllPhotosPage: React.FC = () => {
 
   let content;
   if (data && data.length > 0) {
-    content = (<Gallery isOwner={true} photos={data}/>);
+    content = (<Gallery photos={data}/>);
   } else {
     content = <h2>No photos found in this event!</h2>;
   }

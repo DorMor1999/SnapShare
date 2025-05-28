@@ -1,7 +1,7 @@
 import { Request, Response, RequestHandler } from 'express';
 import { getUserById } from '../services/user.service';
 import * as EventService from '../services/event.service';
-import { getPhotosByEventId, getUserPhotosByEventId } from '../services/photo.service';
+import { getPhotosByEventId, getUserPhotosByEventId, getPhotoWithUsers } from '../services/photo.service';
 
 export const getAllEvents: RequestHandler = async (req, res) => {
   try {
@@ -182,5 +182,18 @@ export const getEventUserPhotos: RequestHandler = async (req, res) => {
     res.status(200).json(photos);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch event photos.", error });
+  }
+};
+
+export const getPhotoIncludeUsers = async (req: Request, res: Response) => {
+  const { photoId } = req.params;
+
+  try {
+    const photo = await getPhotoWithUsers(photoId);
+    res.status(200).json(photo);
+    return;
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+    return;
   }
 };

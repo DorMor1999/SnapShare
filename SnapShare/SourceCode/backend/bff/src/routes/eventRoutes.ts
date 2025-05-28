@@ -9,7 +9,8 @@ import {
   getUserEvents,
   recognizeEventPhotos,
   getEventPhotos,
-  getEventUserPhotos
+  getEventUserPhotos,
+  getPhotoIncludeUsers
 } from '../controllers/event.controller';
 import {
   createEventSchema,
@@ -35,5 +36,6 @@ router.post("/:eventId/photos", parseFormData, uploadEventPhotos);
 router.post("/:eventId/recognize", recognizeEventPhotos);
 router.get("/:eventId/photos", getEventPhotos);
 router.get("/:eventId/user-photos/:userId", getEventUserPhotos);
+router.get("/:eventId/photos/:photoId", getPhotoIncludeUsers);
 
 export default router;
