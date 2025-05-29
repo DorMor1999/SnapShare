@@ -99,3 +99,13 @@ export const getPhotoWithUsers = async (photoId: string) => {
 
   return photo;
 };
+
+export const fetchPhotoById = async (photoId: string): Promise<IPhoto> => {
+  try {
+    const photo = await photoDal.getPhotoById(photoId);
+    return photo;
+  } catch (error) {
+    console.error("Service error fetching photo by ID:", error);
+    throw new Error("Could not fetch photo");
+  }
+};

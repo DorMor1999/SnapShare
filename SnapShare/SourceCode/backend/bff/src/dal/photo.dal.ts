@@ -106,3 +106,17 @@ export const getPhotosWithUserPositionsInEvent = async (
 
   return photosWithUserPositions;
 };
+
+
+export const getPhotoById = async (photoId: string): Promise<IPhoto> => {
+  try {
+    const photo = await Photo.findById(photoId);
+    if (!photo) {
+      throw new Error("Photo not found");
+    }
+    return photo;
+  } catch (error) {
+    console.error("Error retrieving photo by ID:", error);
+    throw new Error("Failed to retrieve photo by ID");
+  }
+};

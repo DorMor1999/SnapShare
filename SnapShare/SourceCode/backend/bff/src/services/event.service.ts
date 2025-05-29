@@ -1,7 +1,7 @@
 import * as eventDal from "../dal/event.dal";
 import { IEvent } from "../models/event.model";
 import mongoose, { SortOrder } from "mongoose";
-import { addUserIdsToPhoto, getPhotosByPhotoIds, uploadEventFiles } from "./photo.service";
+import { addUserIdsToPhoto, fetchPhotoById, getPhotosByPhotoIds, uploadEventFiles } from "./photo.service";
 import { recognizeFaces } from "../services/faceRecognition.service";
 import { IPhoto } from "../models/photo.model";
 import { getUsersByUserIds } from "./user.service";
@@ -120,3 +120,13 @@ export const recognizeEventPhotos = async (
   
   return photoUsersModel;
 };
+
+
+export async function fetchUsersNotInPhoto(eventId: string, photoId: string) {
+  const photo = await fetchPhotoById(photoId);
+  if (!photo) throw new Error("Photo not found");
+
+  const excludedUserIds = photo.userIds.map((id) => id.toString());
+
+  return await eventDal.getEventUsersExcludingList(eventId, excludedUserIds);
+}

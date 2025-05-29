@@ -10,7 +10,8 @@ import {
   recognizeEventPhotos,
   getEventPhotos,
   getEventUserPhotos,
-  getPhotoIncludeUsers
+  getPhotoIncludeUsers,
+  getEventUsersExcludingPhotoUsers
 } from '../controllers/event.controller';
 import {
   createEventSchema,
@@ -37,5 +38,6 @@ router.post("/:eventId/recognize", recognizeEventPhotos);
 router.get("/:eventId/photos", getEventPhotos);
 router.get("/:eventId/user-photos/:userId", getEventUserPhotos);
 router.get("/:eventId/photos/:photoId", getPhotoIncludeUsers);
+router.get("/:eventId/photos/:photoId/users-exclude-photo", getEventUsersExcludingPhotoUsers);
 
 export default router;
