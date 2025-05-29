@@ -59,3 +59,50 @@ export const getPhotoByIdWithUsers = async (photoId: string) => {
     })
     .exec();
 };
+
+export const getPhotosWithUserPositionsInEvent = async (
+  eventId: string,
+  userId: string
+) => {
+  const userObjectId = new Types.ObjectId(userId);
+
+  const photosWithUserPositions = await Photo.aggregate([
+    {
+      $match: { eventId }
+    },
+    {
+      $lookup: {
+        from: "photousers",
+        let: { photoId: "$_id" },
+        pipeline: [
+          { $unwind: "$photoTags" },
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$photoTags.photoId", "$$photoId"] },
+                  { $eq: ["$userId", userObjectId] }
+                ]
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              userId: 1,
+              position: "$photoTags.position"
+            }
+          }
+        ],
+        as: "userPositions"
+      }
+    },
+    {
+      $match: {
+        userPositions: { $ne: [] }
+      }
+    }
+  ]);
+
+  return photosWithUserPositions;
+};

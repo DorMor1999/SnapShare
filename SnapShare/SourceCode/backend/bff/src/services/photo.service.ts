@@ -4,6 +4,7 @@ import { IPhoto } from "../models/photo.model";
 import { getBlobContainerClient } from "./clients/photoStorage.client";
 import { Types } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+import { getPhotoUserByUserId } from "./photoUser.service";
 
 export const uploadEventFiles = async (
   files: Express.Multer.File[], eventId: string): Promise<Partial<IPhoto>[]> => {
@@ -78,8 +79,8 @@ export const getUserPhotosByEventId = async (
   userId: string
 ): Promise<IPhoto[]> => { 
   try {
-    const photos = await photoDal.getPhotosByEventId(eventId);
-    return photos.filter(photo => photo.userIds?.includes(new mongoose.Types.ObjectId(userId)));
+    const photos = await photoDal.getPhotosWithUserPositionsInEvent(eventId, userId);
+    return photos;
   } catch (error) {
     console.error("Error retrieving user photos by event ID:", error);
     throw new Error("Failed to retrieve user photos by event ID");
