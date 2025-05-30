@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, ListGroup, Image, Form } from 'react-bootstrap';
 
 export interface PopulatedUser {
@@ -15,6 +15,7 @@ interface ModalUsersProps {
   show: boolean;
   onHide: () => void;
   onSelect: (userIds: string[]) => void;
+  selectedUserIds?: string[];
 }
 
 const ModalUsers: React.FC<ModalUsersProps> = ({
@@ -23,18 +24,27 @@ const ModalUsers: React.FC<ModalUsersProps> = ({
   show,
   onHide,
   onSelect,
+  selectedUserIds = [],
 }) => {
   const [selected, setSelected] = useState<string[]>([]);
 
   const handleChange = (userId: string) => {
     if (isMultipart) {
       setSelected((prev) =>
-        prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+        prev.includes(userId)
+          ? prev.filter((id) => id !== userId)
+          : [...prev, userId]
       );
     } else {
       setSelected([userId]);
     }
   };
+
+  useEffect(() => {
+    if (show) {
+      setSelected(selectedUserIds || []);
+    }
+  }, [show, selectedUserIds]);
 
   const handleSubmit = () => {
     onSelect(selected);
@@ -77,7 +87,11 @@ const ModalUsers: React.FC<ModalUsersProps> = ({
         <Button variant="secondary" onClick={onHide}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSubmit} disabled={selected.length === 0}>
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={selected.length === 0}
+        >
           Select
         </Button>
       </Modal.Footer>

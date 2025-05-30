@@ -50,11 +50,16 @@ const AddTagPage: React.FC = () => {
   mockUsers = data;
 
   useEffect(() => {
-      const API_URL = import.meta.env.VITE_API_URL;
-      sendRequest(`${API_URL}/events/${eventId}/photos/${photoId}/users-exclude-photo`, 'GET', undefined, {
+    const API_URL = import.meta.env.VITE_API_URL;
+    sendRequest(
+      `${API_URL}/events/${eventId}/photos/${photoId}/users-exclude-photo`,
+      'GET',
+      undefined,
+      {
         Authorization: `Bearer ${token}`,
-      });
-    }, [token, eventId]);
+      }
+    );
+  }, [token, eventId]);
 
   const handleUserSelect = (userIds: string[]) => {
     const user = mockUsers.find((u) => u._id === userIds[0]);
@@ -65,15 +70,16 @@ const AddTagPage: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<FormData> = async (formData) => {
-    console.log('Submitted data:', formData);
-    // const API_URL = import.meta.env.VITE_API_URL;
-    // const { data, error } = await sendRequest(
-    //   `${API_URL}/some-endpoint`,
-    //   'POST',
-    //   { ...formData },
-    //   { Authorization: `Bearer ${token}` }
-    // );
-    // if (!error) navigate(`/events/${eventId}/photos/${photoId}`);
+    const API_URL = import.meta.env.VITE_API_URL;
+    const { error } = await sendRequest(
+      `${API_URL}/events/${eventId}/photo/${photoId}/user/${formData.userId}/position/${formData.position}`,
+      'PATCH',
+      undefined,
+      { Authorization: `Bearer ${token}` }
+    );
+    if (!error) {
+      navigate(`/events/${eventId}/photos/${photoId}`);
+    }
   };
 
   return (
@@ -127,8 +133,9 @@ const AddTagPage: React.FC = () => {
                     {...tagRegister('position', {
                       required: 'Position is required',
                       validate: (value) =>
-                        ['Close (Main Subject)', 'Background'].includes(value) ||
-                        'Invalid position selected',
+                        ['Close (Main Subject)', 'Background'].includes(
+                          value
+                        ) || 'Invalid position selected',
                     })}
                     error={errors.position}
                   />
@@ -156,6 +163,7 @@ const AddTagPage: React.FC = () => {
           show={showUserModal}
           onHide={() => setShowUserModal(false)}
           onSelect={handleUserSelect}
+          selectedUserIds={selectedUser ? [selectedUser._id] : []}
         />
       )}
     </Fragment>
