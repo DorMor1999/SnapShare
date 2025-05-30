@@ -17,7 +17,8 @@ import {
   createPhotoGroup,
   updatePhotoGroup,
   deletePhotoGroup,
-  getEventPhotoGroups
+  getEventPhotoGroups,
+  getEventPhotoGroupsForUser
 } from '../controllers/event.controller';
 import {
   createEventSchema,
@@ -51,5 +52,6 @@ router.post('/:eventId/photo-group', validateRequest(createPhotoGroupSchema), cr
 router.put('/:eventId/photo-group/:groupId', validateRequest(updatePhotoGroupSchema), updatePhotoGroup);
 router.delete('/:eventId/photo-group/:groupId', deletePhotoGroup);
 router.get('/:eventId/photo-group', getEventPhotoGroups);
+router.get('/:eventId/photo-group/user/:userId', getEventPhotoGroupsForUser);
 
 export default router;

@@ -359,3 +359,18 @@ export const getEventPhotoGroups: RequestHandler = async (req, res) => {
     res.status(500).json({ message: `Failed to delete photo group. for: ${error.message}`, error });
   }
 };
+
+export const getEventPhotoGroupsForUser: RequestHandler = async (req, res) => {
+  try {
+    let result = await PhotoGroupService.getEventPhotoGroupsForUser(req.params.eventId, req.params.userId);
+    if (!result) {
+      res.status(404).json({ message: "No photo groups found for this event." });
+      return;
+    }
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ message: `Failed to delete photo group. for: ${error.message}`, error });
+  }
+};
+

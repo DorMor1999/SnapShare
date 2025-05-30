@@ -87,3 +87,21 @@ export const getEventPhotoGroups = async (eventId: string): Promise<any[]> => {
 
   return result;
 };
+
+export const getEventPhotoGroupsForUser  = async (eventId: string, userId: string): Promise<any[]> => {
+  const photoGroups = await PhotoGroupDAL.getPhotoGroupsByEventId(eventId);
+
+  const result = await Promise.all(
+    photoGroups.map(async (photoGroup) => {
+      const userIds = photoGroup.userIds.map((id) => id.toString());
+      const usersAndPhotos = await PhotoUserService.getUsersAndPhotosByUserIds(userIds);
+      return {
+        photoGroup,
+        users: usersAndPhotos.users,
+        photos: usersAndPhotos.photos,
+      };
+    })
+  );
+
+  return result.filter(group => group.photoGroup.userIds.some(id => id.toString() === userId));
+};
