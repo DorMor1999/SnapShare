@@ -18,7 +18,8 @@ import {
   updatePhotoGroup,
   deletePhotoGroup,
   getEventPhotoGroups,
-  getEventPhotoGroupsForUser
+  getEventPhotoGroupsForUser,
+  getPhotoGroupById
 } from '../controllers/event.controller';
 import {
   createEventSchema,
@@ -50,6 +51,7 @@ router.patch("/:eventId/photo/:photoId/user/:userId/position/:position", addUser
 router.patch("/:eventId/photo/:photoId/user/:userId", removeUserTagFromPhoto);
 router.post('/:eventId/photo-group', validateRequest(createPhotoGroupSchema), createPhotoGroup);
 router.put('/:eventId/photo-group/:groupId', validateRequest(updatePhotoGroupSchema), updatePhotoGroup);
+router.get('/:eventId/photo-group/:groupId', getPhotoGroupById);
 router.delete('/:eventId/photo-group/:groupId', deletePhotoGroup);
 router.get('/:eventId/photo-group', getEventPhotoGroups);
 router.get('/:eventId/photo-group/user/:userId', getEventPhotoGroupsForUser);
