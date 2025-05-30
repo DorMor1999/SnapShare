@@ -5,20 +5,13 @@ import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
 import useHttpRequest from '../../hooks/useHttpRequest';
 import { UserContext } from '../../context/UserContext';
-
-type User = {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profilePhotosUrls: string[][];
-};
+import { PopulatedUser } from '../../shared/components/UI/Modal/ModalUsers';
 
 type Group = {
   _id: string;
   eventId: string;
   name: string;
-  userIds: User[];
+  userIds: PopulatedUser[];
 };
 
 type Response = Group;
@@ -43,7 +36,7 @@ const EditGroupPage: React.FC = () => {
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
       {loading && <SpinnerOverlay />}
-      <GroupForm formType="Edit Group" groupName={data?.name} groupId={groupId} />
+      <GroupForm formType="Edit Group" groupName={data?.name} groupId={groupId} usersInside={data?.userIds}/>
     </Fragment>
   );
 };
