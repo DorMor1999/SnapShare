@@ -104,7 +104,7 @@ const AddTagPage: React.FC = () => {
                     <MyButton
                       text="Choose User"
                       variant="secondary"
-                      size="sm"
+                      size={undefined}
                       onClick={() => setShowUserModal(true)}
                       type="button"
                     />
