@@ -41,9 +41,17 @@ const TagTable: React.FC<TagTableProps> = ({ users }) => {
     });
   }, [token, eventId]);
 
-  function deleteTag(photoId: string, userId: string) {
-    console.log(photoId, userId);
-    //need to finish delete
+  async function deleteTag(photoId: string, selectedUserId: string) {
+    const API_URL = import.meta.env.VITE_API_URL;
+    const { error } = await sendRequest(
+      `${API_URL}/events/${eventId}/photo/${photoId}/user/${selectedUserId}`,
+      'PATCH',
+      undefined,
+      { Authorization: `Bearer ${token}` }
+    );
+    if (!error) {
+      window.location.reload();
+    }
   }
 
   let tagContent;
@@ -131,7 +139,6 @@ const TagTable: React.FC<TagTableProps> = ({ users }) => {
     tagContent = <h2>We have problem please try again later!!</h2>;
   }
 
-  
   return (
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
