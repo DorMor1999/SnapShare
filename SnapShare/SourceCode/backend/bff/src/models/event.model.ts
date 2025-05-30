@@ -5,7 +5,6 @@ export interface IEvent extends Document {
   date: Date;
   owners: Types.ObjectId[];
   participants: Types.ObjectId[];
-  photoGroups: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,13 +30,6 @@ const eventSchema = new Schema<IEvent>(
       {
         type: Types.ObjectId,
         ref: "User",
-        required: true,
-      },
-    ],
-    photoGroups: [
-      {
-        type: Types.ObjectId,
-        ref: "PhotoGroup",
         required: true,
       },
     ],

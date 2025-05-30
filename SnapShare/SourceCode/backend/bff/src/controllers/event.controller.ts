@@ -1,11 +1,14 @@
 import { Request, Response, RequestHandler } from 'express';
 import { getUserById } from '../services/user.service';
 import * as EventService from '../services/event.service';
+import * as PhotoGroupService from '../services/photoGroup.service';
 import {
   getPhotosByEventId,
   getUserPhotosByEventId,
   getPhotoWithUsers,
 } from '../services/photo.service';
+import { IPhotoGroup } from '../models/photoGroup.model';
+import mongoose from 'mongoose';
 
 export const getAllEvents: RequestHandler = async (req, res) => {
   try {
@@ -35,8 +38,7 @@ export const createEvent: RequestHandler = async (
       name,
       date,
       owners: [ownerId],
-      participants: [],
-      photoGroups: [],
+      participants: []
     });
 
     res.status(201).json(newEvent);
@@ -233,3 +235,127 @@ export async function getEventUsersExcludingPhotoUsers(
     return;
   }
 }
+
+export const addUserTagToPhoto: RequestHandler = async (req, res) => {
+  const { photoId, userId, position } = req.params;
+
+  try {
+    if (!photoId || !userId || !position) {
+      res.status(400).json({ message: "Missing photoId, userId or position." });
+      return;
+    }
+
+    // Add userId to the photo
+    await EventService.addUserTag(photoId, userId, position);
+
+    res.status(200).json({
+      message: "UserTag added successfully."
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to add UserTag.", error });
+  }
+};
+
+export const removeUserTagFromPhoto: RequestHandler = async (req, res) => {
+  const { photoId, userId } = req.params;
+
+  try {
+    if (!photoId || !userId) {
+      res.status(400).json({ message: "Missing photoId or userId." });
+      return;
+    }
+
+    // Remove userId from the photo
+    await EventService.removeUserTag(photoId, userId);
+
+    res.status(200).json({
+      message: "UserTag removed successfully."
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to remove UserTag.", error });
+  }
+}
+
+export const createPhotoGroup: RequestHandler = async (req, res) => {
+  const { eventId } = req.params;
+  const { name, userIds } = req.body;
+
+  try {
+    if (!eventId || !name || !userIds || userIds.length === 0) {
+      res.status(400).json({ message: "Missing required fields." });
+      return;
+    }
+    let eid = new mongoose.Types.ObjectId(eventId)
+
+    let photoGroup: Partial<IPhotoGroup> = { eventId: eid, name, userIds };
+    const newPhotoGroup = await PhotoGroupService.createPhotoGroup(photoGroup);
+
+    res.status(201).json(newPhotoGroup);
+  } catch (error: any) {
+    res.status(500).json({ message: `Failed to create photo group. for: ${error.message}`, error });
+  }
+}
+
+export const updatePhotoGroup: RequestHandler = async (req, res) => {
+  const { eventId, groupId } = req.params;
+  const { name, userIds, description } = req.body;
+
+  try {
+    if (!eventId || !groupId) {
+      res.status(400).json({ message: "Missing eventId or groupId." });
+      return;
+    }
+
+    let updateData: Partial<IPhotoGroup> = {};
+    if (name) updateData.name = name;
+    if (userIds) updateData.userIds = userIds;
+    if (description) updateData.description = description;
+
+    const updatedGroup = await PhotoGroupService.updatePhotoGroup(groupId, eventId, updateData);
+
+    if (!updatedGroup) {
+      res.status(404).json({ message: "Photo group not found." });
+      return;
+    }
+
+    res.status(200).json(updatedGroup);
+  } catch (error: any) {
+    res.status(500).json({ message: `Failed to update photo group. for: ${error.message}`, error });
+  }
+}
+
+export const deletePhotoGroup: RequestHandler = async (req, res) => {
+  const { eventId, groupId } = req.params;
+
+  try {
+    if (!eventId || !groupId) {
+      res.status(400).json({ message: "Missing eventId or groupId." });
+      return;
+    }
+
+    const deletedGroup = await PhotoGroupService.deletePhotoGroup(groupId);
+
+    if (!deletedGroup) {
+      res.status(404).json({ message: "Photo group not found." });
+      return;
+    }
+
+    res.status(200).json({ message: "Photo group deleted successfully." });
+  } catch (error: any) {
+    res.status(500).json({ message: `Failed to delete photo group. for: ${error.message}`, error });
+  }
+};
+
+
+export const getEventPhotoGroups: RequestHandler = async (req, res) => {
+  try {
+    let result = await PhotoGroupService.getEventPhotoGroups(req.params.eventId);
+    if (!result) {
+      res.status(404).json({ message: "No photo groups found for this event." });
+      return;
+    }
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ message: `Failed to delete photo group. for: ${error.message}`, error });
+  }
+};

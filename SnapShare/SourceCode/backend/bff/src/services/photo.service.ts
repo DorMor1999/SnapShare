@@ -68,10 +68,11 @@ export const getPhotosByPhotoIds = async (photoIds: string[]): Promise<IPhoto[]>
 
 export const addUserIdsToPhoto = async (
   photoId: string,
-  userIds: string[]
+  userIds: string[],
+  session?: any
 ): Promise<IPhoto | null> => {
   const objectIdUserIds = userIds.map((id) => new mongoose.Types.ObjectId(id));
-  return await photoDal.updatePhotoUserIds(photoId, objectIdUserIds);
+  return await photoDal.updatePhotoUserIds(photoId, objectIdUserIds, session);
 };
 
 export const getUserPhotosByEventId = async (
@@ -109,3 +110,16 @@ export const fetchPhotoById = async (photoId: string): Promise<IPhoto> => {
     throw new Error("Could not fetch photo");
   }
 };
+
+export const removeUserFromUserIds = async (photoId: string, userId: string, session?: any): Promise<IPhoto | null> => {
+  if (!Types.ObjectId.isValid(photoId) || !Types.ObjectId.isValid(userId)) {
+    throw new Error("Invalid photo or user ID");
+  }
+
+  const user = await getPhotoUserByUserId(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return await photoDal.removePhotoUserIds(photoId, [new Types.ObjectId(userId)], session);
+}

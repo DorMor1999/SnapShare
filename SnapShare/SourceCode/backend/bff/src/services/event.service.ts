@@ -1,14 +1,15 @@
 import * as eventDal from "../dal/event.dal";
 import { IEvent } from "../models/event.model";
 import mongoose, { SortOrder } from "mongoose";
-import { addUserIdsToPhoto, fetchPhotoById, getPhotosByPhotoIds, uploadEventFiles } from "./photo.service";
+import { addUserIdsToPhoto, fetchPhotoById, getPhotosByPhotoIds, removeUserFromUserIds, uploadEventFiles } from "./photo.service";
 import { recognizeFaces } from "../services/faceRecognition.service";
 import { IPhoto } from "../models/photo.model";
 import { getUsersByUserIds } from "./user.service";
 import { IUser } from "../models/user.model";
 import { FaceRecognitionRecognizeResponse } from "../models/api-responses/faceRecognitionRecognize.response";
-import { createPhotoUser, getPhotoUserByUserId, updatePhotoUserById } from "./photoUser.service";
+import { addPhotoTagToUser, createPhotoUser, getPhotoUserByUserId, removePhotoTagFromUser, updatePhotoUserById } from "./photoUser.service";
 import { IPhotoUser, PhotoTag } from "../models/photoUser.model";
+import { executeTransaction } from "../dal/transaction.manager.dal";
 
 export const getAllEvents = async (): Promise<IEvent[]> => {
   return await eventDal.findAll();
@@ -48,7 +49,7 @@ export const uploadEventPhotos = async (eventId: string, photos: Express.Multer.
   event.updatedAt = new Date(); 
   let savedPhotos = await uploadEventFiles(photos, eventId);
 
-  return await eventDal.update(eventId, { photoGroups: event.photoGroups });
+  return await eventDal.update(eventId, {});
 };
 
 
@@ -130,3 +131,49 @@ export async function fetchUsersNotInPhoto(eventId: string, photoId: string) {
 
   return await eventDal.getEventUsersExcludingList(eventId, excludedUserIds);
 }
+
+export async function addUserTag(photoId: string, userId: string, position: string) {
+    let res = await executeTransaction(async (session) => {
+        return await addPhotoUserIdsAndPhotoUserTagSession(session, photoId, userId, position);
+    });
+
+    if(!res) {
+        throw new Error("Failed to add user tag to photo");
+    }
+}
+
+const addPhotoUserIdsAndPhotoUserTagSession = async (session: any, photoId: string, userId: string, position: string): Promise<boolean> => {
+    let result = true;
+
+    let photoRes = await addUserIdsToPhoto(photoId, [userId], session);
+    let photoUserRes = await addPhotoTagToUser(userId, photoId, position, session);
+    if(!photoRes || !photoUserRes) {
+        result = false;
+        throw new Error("Failed to add user tag to photo");
+    }
+
+    return result;
+};
+
+export async function removeUserTag(photoId: string, userId: string){
+  let res = await executeTransaction(async (session) => {
+    return await removePhotoUserIdsAndPhotoUserTagSession(session, photoId, userId);
+  });
+
+  if(!res) {
+      throw new Error("Failed to remove user tag to photo");
+  }
+}
+
+const removePhotoUserIdsAndPhotoUserTagSession = async (session: any, photoId: string, userId: string): Promise<boolean> => {
+  let result = true;
+
+  let photoRes = await removeUserFromUserIds(photoId, userId, session);
+  let photoUserRes = await removePhotoTagFromUser(userId, photoId, session);
+  if(!photoRes || !photoUserRes) {
+      result = false;
+      throw new Error("Failed to remove user tag to photo");
+  }
+
+  return result;
+};

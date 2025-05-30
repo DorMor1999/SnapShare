@@ -42,12 +42,23 @@ export const getPhotosByIds = async (photoIds: string[]): Promise<IPhoto[]> => {
 
 export const updatePhotoUserIds = async (
   photoId: string,
-  userIds: Types.ObjectId[]
+  userIds: Types.ObjectId[],
+  session?: any
 ): Promise<IPhoto | null> => {
   return await Photo.findByIdAndUpdate(
     photoId,
     { $addToSet: { userIds: { $each: userIds } } }, // Add userIds to the list
-    { new: true }
+    { new: true, session }, // Use session for transaction
+  ).exec();
+};
+
+export const removePhotoUserIds = async (
+  photoId: string, userIds: Types.ObjectId[], session?: any
+): Promise<IPhoto | null> => {
+  return await Photo.findByIdAndUpdate(
+    photoId,
+    { $pull: { userIds: { $in: userIds } } }, // Remove userIds from the list
+    { new: true, session }
   ).exec();
 };
 

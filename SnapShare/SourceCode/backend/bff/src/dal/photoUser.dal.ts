@@ -13,11 +13,19 @@ export const getPhotoUserByUserId = async (userId: string): Promise<IPhotoUser |
   return await PhotoUser.findOne({ userId }).populate("photoTags").exec();
 };
 
+export const getPhotoUsersByUserIds = async (userIds: string[]): Promise<IPhotoUser[]> => {
+  if (!userIds || userIds.length === 0) {
+    return [];
+  }
+  return await PhotoUser.find({ userId: { $in: userIds } }).populate("photoTags").exec();
+}
+
 export const updatePhotoUser = async (
   id: string,
-  updateData: Partial<IPhotoUser>
+  updateData: Partial<IPhotoUser>,
+  session?: any
 ): Promise<IPhotoUser | null> => {
-  return await PhotoUser.findByIdAndUpdate(id, updateData, { new: true }).exec();
+  return await PhotoUser.findByIdAndUpdate(id, updateData, { new: true, session }).exec();
 };
 
 export const deletePhotoUser = async (id: string): Promise<boolean> => {
