@@ -28,6 +28,7 @@ import AllGroupsPage from './pages/AllGroups/AllGroupsPage';
 import NewGroupPage from './pages/NewGroup/NewGroupPage';
 import EditGroupPage from './pages/EditGroup/EditGroupPage';
 import GroupPage from './pages/Group/GroupPage';
+import MyGroupsPage from './pages/MyGroups/MyGroupsPage';
 
 
 
@@ -53,6 +54,7 @@ function App() {
         <Route path="/events/:eventId/photos/:photoId" element={<PhotoPage />} />
         <Route path="/events/:eventId/photos/:photoId/add_tag" element={<AddTagPage />} />
         <Route path="/events/:eventId/groups/all" element={<AllGroupsPage />} />
+        <Route path="/events/:eventId/groups/my" element={<MyGroupsPage />} />
         <Route path="/events/:eventId/groups/new" element={<NewGroupPage />} />
         <Route path="/events/:eventId/groups/:groupId/edit" element={<EditGroupPage />} />
         <Route path="/events/:eventId/groups/:groupId" element={<GroupPage />} />
