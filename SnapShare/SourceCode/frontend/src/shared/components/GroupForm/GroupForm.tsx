@@ -20,6 +20,10 @@ interface GroupFormProps {
   usersInside?: PopulatedUser[];
 }
 
+type responseFormNew = {
+  _id: string;
+};
+
 type responseType = {
   owners: PopulatedUser[];
   participants: PopulatedUser[];
@@ -38,8 +42,9 @@ const GroupForm: React.FC<GroupFormProps> = ({
 }) => {
   const { eventId } = useParams();
   const { token } = useContext(UserContext);
-  const { data, error, loading, sendRequest, clearError } =
-    useHttpRequest<responseType>();
+  const { data, error, loading, sendRequest, clearError } = useHttpRequest<
+    responseType | responseFormNew
+  >();
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<PopulatedUser[]>(
     usersInside || []
@@ -57,7 +62,7 @@ const GroupForm: React.FC<GroupFormProps> = ({
       userIds: [],
     },
   });
-  
+
   useEffect(() => {
     reset({
       name: groupName || '',
@@ -76,10 +81,19 @@ const GroupForm: React.FC<GroupFormProps> = ({
     });
   }, [token, eventId]);
 
-  const mockUsers: PopulatedUser[] = data
-    ? [...data?.participants, ...data?.owners]
-    : [];
+  let mockUsers: PopulatedUser[] = [];
 
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'owners' in data &&
+    'participants' in data &&
+    Array.isArray((data as responseType).owners) &&
+    Array.isArray((data as responseType).participants)
+  ) {
+    const typedData = data as responseType;
+    mockUsers = [...typedData.participants, ...typedData.owners];
+  }
   const navigate = useNavigate();
 
   const handleUserSelect = (userIds: string[]) => {
@@ -90,55 +104,36 @@ const GroupForm: React.FC<GroupFormProps> = ({
 
   const onSubmit: SubmitHandler<FormData> = async (formData) => {
     const API_URL = import.meta.env.VITE_API_URL;
-    console.log(formData);
-    // const inputDateStr = formData.date; // e.g., "1999-06-12T12:00"
 
-    // // Parse the input as a local Date object
-    // const localDate = new Date(inputDateStr);
+    let requestError: undefined | string;
+    if (formType === 'New Group') {
+      const { data, error } = await sendRequest(
+        `${API_URL}/events/${eventId}/photo-group`,
+        'POST',
+        formData,
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      if (data && '_id' in data) {
+        groupId = data._id; // now TS knows data has _id
+      }
+      requestError = error;
+    } else {
+      const { error } = await sendRequest(
+        `${API_URL}/events/${eventId}/photo-group/${groupId}`,
+        'PUT',
+        formData,
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      requestError = error;
+    }
 
-    // // Format it as UTC with 'Z'
-    // const formattedDate = `${localDate.getFullYear()}-${String(
-    //   localDate.getMonth() + 1
-    // ).padStart(2, '0')}-${String(localDate.getDate()).padStart(
-    //   2,
-    //   '0'
-    // )}T${String(localDate.getHours()).padStart(2, '0')}:${String(
-    //   localDate.getMinutes()
-    // ).padStart(2, '0')}:00.000Z`;
-
-    // let requestError: undefined | string;
-    // if (formType === 'New Event') {
-    //   const { error } = await sendRequest(
-    //     `${API_URL}/events`,
-    //     'POST',
-    //     {
-    //       name: formData.name,
-    //       date: formattedDate,
-    //       ownerId: userId,
-    //     },
-    //     {
-    //       Authorization: `Bearer ${token}`,
-    //     }
-    //   );
-    //   requestError = error;
-    // } else {
-    //   const { error } = await sendRequest(
-    //     `${API_URL}/events/${eventId}`,
-    //     'PUT',
-    //     {
-    //       name: formData.name,
-    //       date: formattedDate,
-    //     },
-    //     {
-    //       Authorization: `Bearer ${token}`,
-    //     }
-    //   );
-    //   requestError = error;
-    // }
-
-    // if (!requestError) {
-    //   navigate('/events?sortBy=date&orderBy=desc');
-    // }
+    if (!requestError) {
+      navigate(`/events/${eventId}/groups/${groupId}`);
+    }
   };
 
   return (

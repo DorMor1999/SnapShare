@@ -13,7 +13,7 @@ const AllGroupsPage: React.FC = () => {
       {/* {error && <ErrorModal message={error} onClose={clearError} />}
       {loading && <SpinnerOverlay />} */}
       <Wrapper>
-        <h1>All Photos</h1>
+        <h1>All Groups</h1>
         <MyButton
           type="button"
           size="lg"

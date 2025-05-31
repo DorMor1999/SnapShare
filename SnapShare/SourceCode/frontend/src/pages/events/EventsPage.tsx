@@ -79,8 +79,8 @@ const EventsPage: React.FC = () => {
                   </Dropdown.Item>
                   <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/my_photos`)}>My Photos</Dropdown.Item>
                   <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/all_photos`)}>All Photos</Dropdown.Item>
-                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/my_groups`)}>My Groups</Dropdown.Item>
-                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/all_groups`)}>All Groups</Dropdown.Item>
+                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/groups/my`)}>My Groups</Dropdown.Item>
+                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/groups/all`)}>All Groups</Dropdown.Item>
                   <Dropdown.Item
                     onClick={() =>
                       moveToOtherPage(
