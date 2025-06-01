@@ -7,6 +7,8 @@ import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
 import { Image } from 'react-bootstrap';
 import TagTable from './components/TagTable';
+import { downloadPhoto } from './util/downloadPhoto';
+import MyButton from '../../shared/components/UI/Button/MyButton';
 
 interface PopulatedUser {
   _id: string;
@@ -52,6 +54,9 @@ const PhotoPage: React.FC = () => {
   let content;
   if (data) {
     content = (<Fragment>
+        <br/>
+        <MyButton onClick={() => downloadPhoto(data.url, photoId)} variant={'primary'} size='lg' type='button' text='Download Photo'/>
+        <br/>
         <br/>
         <Image src={data.url} alt={`Photo ${photoId}`} fluid rounded className="mb-3" />
         <br/>
