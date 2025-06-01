@@ -73,9 +73,10 @@ const GroupPage: React.FC = () => {
     }
   }
 
-  const group = Array.isArray(data)
-    ? data.find((g) => g.photoGroup._id === groupId) || null
-    : null;
+  const group =
+    Array.isArray(data) && data.length > 0 && data[0].photoGroup
+      ? data.find((g) => g.photoGroup._id === groupId) || null
+      : null;
   let content;
   if (group) {
     content = (

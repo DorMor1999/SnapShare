@@ -69,7 +69,7 @@ const EventsPage: React.FC = () => {
             {event.isOwner ? (
               <Dropdown>
                 <Dropdown.Toggle variant="primary" id={`dropdown-${event._id}`}>
-                  Manage
+                  Options
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item
@@ -90,17 +90,19 @@ const EventsPage: React.FC = () => {
                   >
                     Owners Participants and Invitations
                   </Dropdown.Item>
-                  <Dropdown.Item href="#">Delete</Dropdown.Item>
+                  
                 </Dropdown.Menu>
               </Dropdown>
             ) : (
-              <MyButton
-                text="My Photos"
-                type="button"
-                variant="primary"
-                size={undefined}
-                onClick={() => moveToOtherPage(`/events/${event._id}/my_photos`)}
-              />
+              <Dropdown>
+                <Dropdown.Toggle variant="primary" id={`dropdown-${event._id}`}>
+                  Options
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/my_photos`)}>My Photos</Dropdown.Item>
+                  <Dropdown.Item onClick={() => moveToOtherPage(`/events/${event._id}/groups/my`)}>My Groups</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             )}
           </div>
           <div className="d-flex flex-column align-items-end">
