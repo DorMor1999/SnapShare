@@ -25,7 +25,7 @@ const MyGroupsPage: React.FC = () => {
     sendRequest(`${API_URL}/events/${eventId}/photo-group/user/${userId}`, 'GET', undefined, {
       Authorization: `Bearer ${token}`,
     });
-  }, [token, eventId]);
+  }, [token, eventId, userId]);
 
   
 
