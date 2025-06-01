@@ -1,10 +1,11 @@
 // Gallery.tsx
 import React, { Fragment, useState } from 'react';
-import {  Row, Col, Card } from 'react-bootstrap';
+import { Row, Col, Card } from 'react-bootstrap';
 import { PhotoArray } from '../../types/Photos';
 import styles from './Gallery.module.css';
 import { useNavigate, useParams } from 'react-router';
-
+import MyButton from '../UI/Button/MyButton';
+import { downloadImagesAsZip } from './util/downloadImagesAsZip';
 
 type GalleryProps = {
   photos: PhotoArray;
@@ -13,7 +14,6 @@ type GalleryProps = {
 const Gallery: React.FC<GalleryProps> = ({ photos }) => {
   const navigate = useNavigate();
   const { eventId } = useParams();
-  
 
   function moveToOtherPage(path: string): void {
     navigate(`${path}`);
@@ -21,12 +21,24 @@ const Gallery: React.FC<GalleryProps> = ({ photos }) => {
 
   return (
     <Fragment>
+      
+      <MyButton
+        onClick={() => downloadImagesAsZip(photos.map((p) => ({url: p.url, name: p._id})), eventId)}
+        variant={'primary'}
+        size="lg"
+        type="button"
+        text="Download All Photos"
+      />
+      <br/>
+      <br/>
       <Row className="g-4">
         {photos.map((photo) => (
           <Col key={photo._id} lg={4} md={6} sm={12}>
             <Card
               className={`h-100 ${styles.cardClickable}`}
-              onClick={() => moveToOtherPage(`/events/${eventId}/photos/${photo._id}`)}
+              onClick={() =>
+                moveToOtherPage(`/events/${eventId}/photos/${photo._id}`)
+              }
             >
               <Card.Img
                 variant="top"
