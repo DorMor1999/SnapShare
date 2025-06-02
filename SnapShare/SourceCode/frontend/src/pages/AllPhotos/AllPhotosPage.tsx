@@ -9,7 +9,6 @@ import { UserContext } from '../../context/UserContext';
 import { PhotoArray } from '../../shared/types/Photos';
 import Gallery from '../../shared/components/Gallery/Gallery';
 
-
 type PhotoArrayResponse = PhotoArray;
 
 const AllPhotosPage: React.FC = () => {
@@ -31,9 +30,37 @@ const AllPhotosPage: React.FC = () => {
     navigate(`${path}`);
   }
 
+  async function startFaceRecognitionProcess(eventId = "") {
+    const API_URL = import.meta.env.VITE_API_URL;
+    const { error } = await sendRequest(
+      `${API_URL}/events/${eventId}/recognize`,
+      'POST',
+      {
+        
+      },
+      { Authorization: `Bearer ${token}` }
+    );
+    if (!error) {
+      window.location.reload();
+    }
+  }
+
   let content;
+  let buttonContent;
   if (data && data.length > 0) {
-    content = (<Gallery photos={data}/>);
+    content = <Gallery photos={data} />;
+    buttonContent = (
+      <Fragment>
+        {' '}
+        <MyButton
+          type="button"
+          size="lg"
+          variant="outline-success"
+          onClick={() => startFaceRecognitionProcess(eventId)}
+          text="Start Face Recognition Process"
+        />
+      </Fragment>
+    );
   } else {
     content = <h2>No photos found in this event!</h2>;
   }
@@ -51,6 +78,7 @@ const AllPhotosPage: React.FC = () => {
           onClick={() => moveToOtherPage(`/events/${eventId}/upload_photos`)}
           text="Upload Photos"
         />
+        {buttonContent && buttonContent}
         <br />
         <br />
         {content}
