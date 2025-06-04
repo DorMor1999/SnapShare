@@ -68,7 +68,7 @@ const AllPhotosPage: React.FC = () => {
   return (
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
-      {loading && <SpinnerOverlay />}
+      {loading && <SpinnerOverlay msg='It might take a while'/>}
       <Wrapper>
         <h1>All Photos</h1>
         <MyButton
