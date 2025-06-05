@@ -34,7 +34,7 @@ SnapShare is an intelligent photo management platform designed for event organiz
 
 This guide explains how to install and run all parts of the application: the face recognition service, the backend (BFF), and the frontend.
 
----
+
 
 ## 📦 Clone the Repository
 
@@ -42,7 +42,7 @@ This guide explains how to install and run all parts of the application: the fac
 git clone https://github.com/DorMor1999/SnapShare
 ```
 
----
+
 
 ## 🧠 Face Recognition Service (Python)
 
@@ -53,7 +53,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
----
+
 
 ## 🖥️ BFF (Backend For Frontend - Node.js)
 
@@ -64,7 +64,7 @@ npm install
 npm run dev
 ```
 
----
+
 
 ## 🌐 Frontend (React App)
 
@@ -75,7 +75,7 @@ npm install
 npm run dev
 ```
 
----
+
 
 Make sure all services are running at the same time for full functionality.
 
