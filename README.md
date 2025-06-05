@@ -30,12 +30,54 @@ SnapShare is an intelligent photo management platform designed for event organiz
 - Simple and quick access to photos from any device.
 - Easy sharing with additional participants.
 
-## Clone
+##  Installation Guide
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/DorMor1999/SnapShare
-   ```
+This guide explains how to install and run all parts of the application: the face recognition service, the backend (BFF), and the frontend.
+
+---
+
+## 📦 Clone the Repository
+
+```bash
+git clone https://github.com/DorMor1999/SnapShare
+```
+
+---
+
+## 🧠 Face Recognition Service (Python)
+
+```bash
+cd .\SnapShare\SourceCode\backend\face_recognition_service\
+pip install -r requirements.txt
+# Run the face recognition service
+python app.py
+```
+
+---
+
+## 🖥️ BFF (Backend For Frontend - Node.js)
+
+```bash
+cd cd .\SnapShare\SourceCode\backend\bff\
+npm install
+# Run the BFF server
+npm run dev
+```
+
+---
+
+## 🌐 Frontend (React App)
+
+```bash
+cd .\SnapShare\SourceCode\frontend\
+npm install
+# Run the frontend development server
+npm run dev
+```
+
+---
+
+Make sure all services are running at the same time for full functionality.
 
 ## Technologies Used
 

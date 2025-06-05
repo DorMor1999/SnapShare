@@ -76,7 +76,7 @@ def get_average_encoding(photo_data_list, cache):
     return None  # Return None if no valid encodings were found
 
 
-def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.5):
+def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.4):
     """
     Compares multiple profiles to multiple faces in other photos.
     Detects and encodes faces once per photo, then compares each detected face to all profiles.
