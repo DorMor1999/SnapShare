@@ -28,41 +28,58 @@ const GroupPage: React.FC = () => {
   const { eventId, groupId } = useParams();
   const navigate = useNavigate();
   const [isOwner, setIsOwner] = React.useState(false);
-  const { data, error, loading, sendRequest, clearError } = useHttpRequest<
-    ResponsePhotoGroups[] | ResponseOwners
-  >();
 
-  useEffect(() => {
-    const fetchEvent = async () => {
-      const API_URL = import.meta.env.VITE_API_URL;
-      const { data } = await sendRequest(
-        `${API_URL}/events/${eventId}`,
-        'GET',
-        undefined,
-        {
-          Authorization: `Bearer ${token}`,
-        }
-      );
+  // Separate hooks for each request
+  const {
+    data: ownersData,
+    error: ownersError,
+    loading: ownersLoading,
+    sendRequest: sendOwnersRequest,
+    clearError: clearOwnersError,
+  } = useHttpRequest<ResponseOwners>();
 
-      if (data && 'owners' in data) {
-        const match = data.owners.some((owner) => owner._id === userId);
-        setIsOwner(match);
-      }
-    };
+  const {
+    data: groupsData,
+    error: groupsError,
+    loading: groupsLoading,
+    sendRequest: sendGroupsRequest,
+    clearError: clearGroupsError,
+  } = useHttpRequest<ResponsePhotoGroups[]>();
 
-    fetchEvent();
-  }, [token, eventId, userId]);
-
+  // Fetch owners
   useEffect(() => {
     const API_URL = import.meta.env.VITE_API_URL;
-    sendRequest(`${API_URL}/events/${eventId}/photo-group`, 'GET', undefined, {
-      Authorization: `Bearer ${token}`,
-    });
+    sendOwnersRequest(
+      `${API_URL}/events/${eventId}`,
+      'GET',
+      undefined,
+      { Authorization: `Bearer ${token}` }
+    );
   }, [token, eventId]);
 
+  // Set isOwner when ownersData arrives
+  useEffect(() => {
+    if (ownersData && 'owners' in ownersData) {
+      const match = ownersData.owners.some((owner) => owner._id === userId);
+      setIsOwner(match);
+    }
+  }, [ownersData, userId]);
+
+  // Fetch groups
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL;
+    sendGroupsRequest(
+      `${API_URL}/events/${eventId}/photo-group`,
+      'GET',
+      undefined,
+      { Authorization: `Bearer ${token}` }
+    );
+  }, [token, eventId]);
+
+  // Delete group handler
   async function deleteGroup(groupId: string, eventId: string) {
     const API_URL = import.meta.env.VITE_API_URL;
-    const { error } = await sendRequest(
+    const { error } = await sendGroupsRequest(
       `${API_URL}/events/${eventId}/photo-group/${groupId}`,
       'DELETE',
       undefined,
@@ -73,12 +90,17 @@ const GroupPage: React.FC = () => {
     }
   }
 
-  const group =
-    Array.isArray(data) && data.length > 0 && data[0].photoGroup
-      ? data.find((g) => g.photoGroup._id === groupId) || null
-      : null;
+  // Find the group
+  let group = null;
+  if (groupsData && Array.isArray(groupsData)) {
+    group = groupsData.find((g) => g.photoGroup._id === groupId) || null;
+  }
+
+  // Render logic
   let content;
-  if (group) {
+  if (ownersLoading || groupsLoading) {
+    content = <SpinnerOverlay />;
+  } else if (group) {
     content = (
       <Fragment>
         <h1>Group - {group.photoGroup.name}</h1>
@@ -127,8 +149,8 @@ const GroupPage: React.FC = () => {
 
   return (
     <Fragment>
-      {error && <ErrorModal message={error} onClose={clearError} />}
-      {loading && <SpinnerOverlay />}
+      {ownersError && <ErrorModal message={ownersError} onClose={clearOwnersError} />}
+      {groupsError && <ErrorModal message={groupsError} onClose={clearGroupsError} />}
       <Wrapper>{content}</Wrapper>
     </Fragment>
   );
