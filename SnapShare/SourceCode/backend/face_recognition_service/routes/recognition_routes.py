@@ -29,8 +29,10 @@ def trigger_recognition(event_id):
         return jsonify({"error": "'users_encodes' must be an array of dictionaries containing 'userId' and 'encoding'"}), 400
 
     try:
+        print("Before fetch photos...")
         # Getting event photos - List of dicts to compare against, each containing 'photo_bytes' and 'photo_key'.
         event_photos = get_Photos(event_photos_keys, event_id)
+        print("After fetch photos...")
 
         # Check if event_photos is empty or None
         if not event_photos:

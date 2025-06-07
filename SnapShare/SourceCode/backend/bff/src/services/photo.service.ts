@@ -26,7 +26,6 @@ export const uploadEventFiles = async (
         };
         const blobName = `events/${eventId}/${photo._id}`;
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-        console.log(`upload blob name: ${blobName}`);
         await blockBlobClient.uploadData(file.buffer, {
           blobHTTPHeaders: { blobContentType: file.mimetype },
         });
