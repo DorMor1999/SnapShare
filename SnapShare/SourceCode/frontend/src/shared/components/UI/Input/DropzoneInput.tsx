@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import styles from './DropzoneInput.module.css'; // optional
+import styles from './DropzoneInput.module.css'; // optional styling
 
 // Helper to generate a unique ID for each file
 const getFileId = (file: File) => `${file.name}_${file.size}_${file.lastModified}`;
@@ -24,6 +24,8 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
   multiple = true,
 }) => {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
+  const [imagesLoaded, setImagesLoaded] = useState(true);
+  const [loadedCount, setLoadedCount] = useState(0);
 
   const handleDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -34,37 +36,47 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
         })
       );
 
+      setImagesLoaded(false);
+      setLoadedCount(0);
+
       setFiles((prevFiles) => {
         const allFiles = [...prevFiles, ...filesWithPreview];
         const uniqueFiles = allFiles.filter(
           (file, idx, arr) => arr.findIndex((f) => f.id === file.id) === idx
         );
         const newFiles = uniqueFiles.slice(0, maxFiles);
-        
-        // Call onDrop asynchronously after state update
+
         setTimeout(() => onDrop(newFiles), 0);
-        
         return newFiles;
       });
     },
     [maxFiles, onDrop]
   );
 
-  const removeFile = useCallback((fileId: string) => {
-    setFiles((prevFiles) => {
-      const fileToRemove = prevFiles.find((f) => f.id === fileId);
-      if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview);
+  const removeFile = useCallback(
+    (fileId: string) => {
+      setFiles((prevFiles) => {
+        const fileToRemove = prevFiles.find((f) => f.id === fileId);
+        if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview);
 
-      const newFiles = prevFiles.filter((file) => file.id !== fileId);
-      
-      // Call onDrop asynchronously after state update
-      setTimeout(() => onDrop(newFiles), 0);
-      
-      return newFiles;
-    });
-  }, [onDrop]);
+        const newFiles = prevFiles.filter((file) => file.id !== fileId);
+        setTimeout(() => onDrop(newFiles), 0);
+        return newFiles;
+      });
+    },
+    [onDrop]
+  );
 
-  // Clean up previews when component unmounts
+  const handleImageLoad = useCallback(() => {
+    setLoadedCount((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    if (loadedCount >= files.length && files.length > 0) {
+      setImagesLoaded(true);
+    }
+  }, [loadedCount, files.length]);
+
   useEffect(() => {
     return () => {
       files.forEach((file) => URL.revokeObjectURL(file.preview));
@@ -91,6 +103,13 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
         )}
       </div>
 
+      {!imagesLoaded && (
+        <div className={styles.spinnerContainer}>
+          <div className={styles.spinner}></div>
+          <p>Loading previews...</p>
+        </div>
+      )}
+
       {files.length > 0 && (
         <div className={styles.previewContainer}>
           {files.map((file) => (
@@ -99,6 +118,7 @@ const DropzoneInput: React.FC<DropzoneInputProps> = ({
                 src={file.preview}
                 alt={`preview ${file.name}`}
                 className={styles.previewImage}
+                onLoad={handleImageLoad}
               />
               <div className={styles.fileName}>{file.name}</div>
               <button

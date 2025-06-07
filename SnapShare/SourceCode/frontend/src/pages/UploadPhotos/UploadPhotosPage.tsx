@@ -1,7 +1,7 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
-import useHttpRequest from '../../hooks/useHttpRequest';
+
 import ErrorModal from '../../shared/components/UI/Modal/ErrorModal';
 import SpinnerOverlay from '../../shared/components/UI/Spinner/SpinnerOverlay';
 import Wrapper from '../../shared/components/UI/Wrapper/Wrapper';
@@ -11,6 +11,8 @@ import DropzoneInput from '../../shared/components/UI/Input/DropzoneInput';
 import MyButton from '../../shared/components/UI/Button/MyButton';
 import classes from './UploadPhotosPage.module.css';
 import { UserContext } from '../../context/UserContext';
+import axios, { AxiosRequestConfig } from 'axios';
+import pLimit from 'p-limit';
 
 const imageTypes = ['image/jpeg', 'image/jpg'];
 const maxFileSize = 25 * 1024 * 1024; // 25MB limit
@@ -27,15 +29,14 @@ const UploadPhotosPage: React.FC = () => {
     setValue,
     watch,
   } = useForm<FormData>();
+  const [batchLoading, setBatchLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
 
   const { token } = useContext(UserContext);
 
   const navigate = useNavigate();
 
   const { eventId } = useParams();
-
-  const { data, error, loading, sendRequest, clearError } =
-    useHttpRequest<any>();
 
   const photos = watch('photos');
 
@@ -65,33 +66,124 @@ const UploadPhotosPage: React.FC = () => {
     });
   }, [registerUploadPhotos]);
 
+  const CHUNK_SIZE = 10; // Adjust as needed
+
+  function chunkArray<T>(array: T[], size: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
+    }
+    return result;
+  }
+
+  const sendRequest = async (
+    url: string,
+    method: 'POST' | 'PUT',
+    body: FormData,
+    headers: Record<string, string>
+  ) => {
+    try {
+      const isFormData = body instanceof FormData;
+
+      const config: AxiosRequestConfig = {
+        method,
+        url,
+        data: body,
+        headers,
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total)
+            console.log(
+              `chank: ${progressEvent.event}, Uploaded ${Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              )}%`
+            );
+        },
+      };
+
+      const response = await axios.request(config);
+
+      return { data: response.data };
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        'An unexpected error occurred';
+
+      return { error: errorMsg };
+    }
+  };
+
+  const uploadPhotosInChunksParallel = async (
+    photos: File[],
+    uploadUrl: string,
+    sendRequest: any
+  ) => {
+    setBatchLoading(true);
+    const chunks = chunkArray(photos, CHUNK_SIZE);
+    const limit = pLimit(3); // max 3 parallel uploads
+
+    const uploadPromises = chunks.map((chunk) =>
+      limit(async () => {
+        const formData = new FormData();
+        chunk.forEach((photo) => {
+          formData.append('files', photo);
+        });
+        return sendRequest(uploadUrl, 'POST', formData, {
+          Authorization: `Bearer ${token}`,
+        });
+      })
+    );
+
+    // Wait for all chunk uploads to finish in parallel
+    const results = await Promise.all(uploadPromises);
+
+    // Optionally, handle errors
+    const errors = results.filter((r) => r.error);
+    if (errors.length > 0) {
+      console.error('Some uploads failed:', errors);
+    }
+    setBatchLoading(false);
+    if (errors.length > 0) {
+      setError(errors[0].error);
+      return { error: errors[0].error };
+    }
+    return {};
+  };
+
   const onSubmit: SubmitHandler<FormData> = async (formData) => {
     const form = new FormData();
 
-    formData.photos.forEach((file, index) => {
-      form.append('files', file);
-    });
+    // formData.photos.forEach((file, index) => {
+    //   form.append('files', file);
+    // });
 
     const API_URL = import.meta.env.VITE_API_URL;
-
-    const { error } = await sendRequest(
+    const { error } = await uploadPhotosInChunksParallel(
+      photos,
       `${API_URL}/events/${eventId}/photos`,
-      'POST',
-      form,
-      {
-        Authorization: `Bearer ${token}`,
-      }
+      sendRequest
     );
+
+    // const { error } = await sendRequest(
+    //   `${API_URL}/events/${eventId}/photos`,
+    //   'POST',
+    //   form,
+    //   {
+    //     Authorization: `Bearer ${token}`,
+    //   }
+    // );
 
     if (!error) {
       navigate(`/events/${eventId}/all_photos`);
     }
   };
 
+  const clearError = () => setError(null);
+
   return (
     <Fragment>
       {error && <ErrorModal message={error} onClose={clearError} />}
-      {loading && <SpinnerOverlay />}
+      {batchLoading && <SpinnerOverlay />}
       <div className={classes['center-height']}>
         <Wrapper>
           <BoxForm sm={12} md={10}>

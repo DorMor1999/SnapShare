@@ -116,15 +116,16 @@ export const getUserEvents: RequestHandler = async (req, res) => {
 export const uploadEventPhotos: RequestHandler = async (req, res) => {
   const { eventId } = req.params;
   const files = req.files as Express.Multer.File[];
-
+  console.log(`start upload events photos`);
   if (!files || files.length === 0) {
     res.status(400).json({ message: 'No files uploaded.' });
     return;
   }
 
   try {
+    console.log(`before uploading, files: ${files.length}`);
     const updatedEvent = await EventService.uploadEventPhotos(eventId, files);
-
+    console.log("after uploading");
     if (!updatedEvent) {
       res.status(404).json({ message: 'Event not found.' });
       return;

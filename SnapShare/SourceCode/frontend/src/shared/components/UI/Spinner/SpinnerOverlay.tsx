@@ -10,12 +10,12 @@ const SpinnerOverlay: React.FC<SpinnerProps> = ({ msg = null }) => {
   return (
     <div className={styles.overlay} role="status" aria-label="Loading">
       <Spinner animation="border" variant="primary" role="status" />
-      {msg && (
+      {/* {msg && (
         <Fragment>
           <br/>
           <p>{msg}</p>
         </Fragment>
-      )}
+      )} */}
     </div>
   );
 };

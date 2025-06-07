@@ -12,9 +12,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# --- Core Face Recognition Logic (Adapted from your script) ---
+# --- Core Face Recognition Logic ---
 
-# dor staff
 def load_and_encode_photo(photo_data, cache):
     """
     Loads a photo from binary data, detects all faces, and encodes them.
@@ -29,24 +28,19 @@ def load_and_encode_photo(photo_data, cache):
             - List of face locations
             - List of face sizes
     """
-    # Check if photo data is already in cache
     photo_hash = hash(photo_data)
     if photo_hash in cache:
         return cache[photo_hash]
     print("Photo not in cache")
-
     # Convert photo data to a photo object
-    photo = Image.open(BytesIO(photo_data)).convert('RGB')  # ✅ Ensure RGB format
-    photo_array = np.array(photo).astype(np.uint8)  # ✅ Ensure 8-bit depth
+    photo = Image.open(BytesIO(photo_data)).convert('RGB')
+    photo_array = np.array(photo).astype(np.uint8)
 
-    face_locations = face_recognition.face_locations(photo_array)  # Detect all faces
-    face_encodings = face_recognition.face_encodings(photo_array, face_locations)  # Encode all faces
-    face_sizes = [(bottom - top) * (right - left) for top, right, bottom, left in
-                  face_locations]  # Calculate face sizes
+    face_locations = face_recognition.face_locations(photo_array)
+    face_encodings = face_recognition.face_encodings(photo_array, face_locations)
+    face_sizes = [(bottom - top) * (right - left) for top, right, bottom, left in face_locations]
 
-    # Cache the processed data
     cache[photo_hash] = (face_encodings, face_locations, face_sizes)
-
     return face_encodings, face_locations, face_sizes
 
 
@@ -62,97 +56,73 @@ def get_average_encoding(photo_data_list, cache):
         np.ndarray: The average encoding of all detected faces in the photos.
     """
     encodings = []
-
     for photo_data in photo_data_list:
         photo_encodings, _, _ = load_and_encode_photo(photo_data, cache)
-        # Ensure only valid encodings are added
         if photo_encodings:
-            encodings.extend(photo_encodings)  # Collect all face encodings
+            encodings.extend(photo_encodings)
 
-    if encodings:
-        encodings = np.array(encodings)  # Convert list to NumPy array
-        return np.mean(encodings, axis=0)  # Compute mean encoding
-
-    return None  # Return None if no valid encodings were found
+    return np.mean(encodings, axis=0) if encodings else None
 
 
 def compare_faces(profiles, other_photos_data, tolerance=0.5, std_factor=0.4):
     """
-    Compares multiple profiles to multiple faces in other photos.
-    Detects and encodes faces once per photo, then compares each detected face to all profiles.
-    Results are returned in a separate 'recognition_results' array containing user_id and matched photos.
+    Compares profile encodings to all detected faces in other photos.
+    Detects and encodes faces once per photo, then compares each to all profiles.
 
     Args:
-        profiles (list): List of profiles to compare, each containing 'encoding' and 'user_id'.
-        other_photos_data (list): List of photo data (dicts) to compare against,
-                                  each containing 'photo_bytes' and 'photo_key'.
-        tolerance (float): Threshold for the match distance.
-        std_factor (float): Factor to define a threshold based on face size variability.
+        profiles (list): List of profiles with 'userId' and 'encoding' (average encoding).
+        other_photos_data (list): List of dicts with 'photo_bytes', 'photo_key', 'photo_id'.
+        tolerance (float): Threshold for face matching.
+        std_factor (float): Controls main subject vs background classification.
 
     Returns:
-        list: A list of dictionaries with 'user_id' and their 'inside_photos' matches.
+        list: A list of dicts with 'userId' and their matched 'photos'.
     """
-
-    recognition_results = []  # This will store the results with 'user_id' and 'inside_photos' for each user
+    recognition_results = []
     cache = {}
 
     for photo_data in other_photos_data:
-        # Extract the photo bytes from the dictionary
         photo_bytes = photo_data.get('photo_bytes')
         if not photo_bytes:
-            print("No photo bytes found in the data.")
-            continue  # Skip if no photo bytes are available
-
-        # Step 1: Detect and encode faces in the current photo (once)
-        other_encodings, face_locations, face_sizes = load_and_encode_photo(photo_bytes, cache)
-
-        if not other_encodings:
-            print("No faces detected in the photo.")
+            logger.warning("Missing 'photo_bytes' in photo data.")
             continue
 
-        # Step 2: Compute face size threshold for position classification
-        avg_face_size = np.mean(face_sizes)
-        std_face_size = np.std(face_sizes)
-        threshold = avg_face_size - (std_factor * std_face_size)
+        encodings, _, sizes = load_and_encode_photo(photo_bytes, cache)
+        if not encodings:
+            logger.info("No faces found in a photo.")
+            continue
 
-        # Step 3: For each detected face in the photo, compare it with all profiles
-        for encoding_index, face_encoding in enumerate(other_encodings):
-            face_size = face_sizes[encoding_index]
+        avg_size = np.mean(sizes)
+        std_size = np.std(sizes)
+        size_threshold = avg_size - (std_factor * std_size)
 
+        for idx, encoding in enumerate(encodings):
+            current_size = sizes[idx]
             for profile in profiles:
-                profile_encoding = profile.get("encoding")
+                profile_encoding = np.array(profile.get("encoding"))
                 if profile_encoding is None:
                     continue
 
-                # Convert the lists to numpy arrays before calculating the distance
-                face_encoding = np.array(face_encoding)
-                profile_encoding = np.array(profile_encoding)
-
-                distance = face_recognition.face_distance([face_encoding], profile_encoding)[0]
-
-                if distance < tolerance:
-                    position = "Close (Main Subject)" if face_size >= threshold else "Background"
-                    match = {
+                dist = face_recognition.face_distance([encoding], profile_encoding)[0]
+                if dist < tolerance:
+                    match_info = {
                         "photo_key": photo_data.get("photo_key"),
-                        "position": position,
-                        "distance": distance,
                         "photo_id": photo_data.get("photo_id"),
+                        "position": "Close (Main Subject)" if current_size >= size_threshold else "Background",
+                        "distance": dist,
                     }
 
-                    # Find if the user already exists in recognition_results
                     user_id = profile.get("userId")
-                    result = next((item for item in recognition_results if item["userId"] == user_id), None)
+                    existing = next((r for r in recognition_results if r["userId"] == user_id), None)
 
-                    if result is None:
-                        # If the user doesn't exist in the results, create a new entry
+                    if not existing:
                         recognition_results.append({
                             "userId": user_id,
-                            "photos": [match]
+                            "photos": [match_info]
                         })
                     else:
-                        # Otherwise, append the match to the existing user's "inside_photos"
-                        result["photos"].append(match)
+                        existing["photos"].append(match_info)
 
         cache.clear()
 
-    return recognition_results  # Return the recognition results array containing user-specific matches
+    return recognition_results
