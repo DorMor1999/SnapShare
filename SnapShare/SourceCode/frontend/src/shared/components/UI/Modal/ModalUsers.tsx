@@ -56,7 +56,7 @@ const ModalUsers: React.FC<ModalUsersProps> = ({
       <Modal.Header closeButton>
         <Modal.Title>Select {isMultipart ? 'Users' : 'User'}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="overflow-auto" style={{ maxHeight: '300px' }}>
         <ListGroup>
           {users.map((user) => (
             <ListGroup.Item key={user._id}>

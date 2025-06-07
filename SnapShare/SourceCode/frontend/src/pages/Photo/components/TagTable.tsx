@@ -133,7 +133,23 @@ const TagTable: React.FC<TagTableProps> = ({ users }) => {
         </Fragment>
       );
     } else {
-      tagContent = <h2>Tags not found!</h2>;
+      tagContent = (
+        <Fragment>
+          <h2>Tags not found!</h2>
+          <br />
+          {isOwner && (
+            <MyButton
+              type="button"
+              variant="primary"
+              text="Add Tag"
+              size="lg"
+              onClick={() =>
+                navigate(`/events/${eventId}/photos/${photoId}/add_tag`)
+              }
+            />
+          )}
+        </Fragment>
+      );
     }
   } else {
     tagContent = <h2>We have problem please try again later!!</h2>;
