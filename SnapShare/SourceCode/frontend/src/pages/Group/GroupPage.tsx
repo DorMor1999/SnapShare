@@ -137,7 +137,7 @@ const GroupPage: React.FC = () => {
           <Accordion.Item eventKey="photos">
             <Accordion.Header>Photos</Accordion.Header>
             <Accordion.Body>
-              <Gallery photos={group.photos} />
+              <Gallery photos={group.photos.filter((p) => p.eventId === eventId)} />
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
