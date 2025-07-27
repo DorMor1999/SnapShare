@@ -88,6 +88,10 @@ Make sure all services are running at the same time for full functionality.
 - **Database:** Azure Cosmos DB for MongoDB
 - **Storage:** Azure Blob Storage
 
+## Demo
+
+[🎥 Watch demo video](SnapShare/ProjectSpecification/example_video_compressed.mp4)
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
